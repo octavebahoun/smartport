@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, LayoutDashboard, Radio, Activity, RefreshCw, BookOpen, FileText, Server, Users, Key } from 'lucide-react';
+import { 
+  Shield, 
+  ArrowRight, 
+  Lock, 
+  Scan, 
+  Activity, 
+  Database, 
+  Users, 
+  CheckCircle2, 
+  Info, 
+  MapPin, 
+  Phone,
+  RefreshCw,
+  LayoutDashboard
+} from 'lucide-react';
 import { apiService } from '../services/api';
 
 export default function Landing({ setView, setLoginRole }) {
   const [online, setOnline] = useState(apiService.isOnline());
   const [queueSize, setQueueSize] = useState(apiService.getQueueSize());
   const [isSyncing, setIsSyncing] = useState(false);
-  const [activeDocTab, setActiveDocTab] = useState('tech'); // 'tech' or 'user'
 
   useEffect(() => {
     const handleConnection = () => {
@@ -37,214 +50,286 @@ export default function Landing({ setView, setLoginRole }) {
     }
   };
 
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <div style={styles.logoContainer}>
-          <Shield size={36} color="var(--primary)" />
-          <h1 style={styles.title}>SmartPort <span style={{ color: 'var(--primary)' }}>Gateway</span></h1>
+      {/* 1. Header & Navigation Bar */}
+      <header style={styles.navbar} className="glass">
+        <div style={styles.navLeft}>
+          <Shield size={28} color="var(--primary)" />
+          <span style={styles.navLogoText}>SmartPort <span style={{ color: 'var(--primary)' }}>Gateway</span></span>
         </div>
-        <div style={styles.statusBadgeContainer}>
-          <div style={{ ...styles.statusIndicator, backgroundColor: online ? 'var(--success)' : 'var(--error)' }} />
-          <span style={styles.statusText}>
-            API: {online ? 'En Ligne (Normal)' : 'Hors-Ligne (Mode Dégradé)'}
-          </span>
+        <nav style={styles.navLinks} className="nav-links-responsive">
+          <button onClick={() => scrollToSection('hero')} style={styles.navLinkBtn} className="nav-link-btn">Accueil</button>
+          <button onClick={() => scrollToSection('about')} style={styles.navLinkBtn} className="nav-link-btn">À propos</button>
+          <button onClick={() => scrollToSection('features')} style={styles.navLinkBtn} className="nav-link-btn">Fonctionnalités</button>
+          <button onClick={() => scrollToSection('roles')} style={styles.navLinkBtn} className="nav-link-btn">Espaces d'accès</button>
+        </nav>
+        <div style={styles.navRight}>
+          <div style={{ ...styles.apiBadge, borderColor: online ? 'var(--success)' : 'var(--error)' }}>
+            <span style={{ ...styles.statusDot, backgroundColor: online ? 'var(--success)' : 'var(--error)' }} />
+            <span style={{ color: online ? 'var(--success)' : 'var(--error)', fontSize: '0.8rem', fontWeight: 600 }}>
+              {online ? 'En ligne' : 'Mode Hors-ligne'}
+            </span>
+          </div>
+          <button onClick={() => scrollToSection('roles')} style={styles.navActionBtn} className="nav-action-btn">
+            Connexion <ArrowRight size={14} style={{ marginLeft: 6 }} />
+          </button>
         </div>
       </header>
 
-      <main style={styles.main}>
-        {/* Welcome Section */}
-        <div style={styles.welcomeSection}>
-          <span style={styles.tagline}>Port Autonome de Cotonou</span>
-          <h2 style={styles.subTitle}>Contrôle d'Accès Logistique & Humain</h2>
-          <p style={styles.description}>
-            Plateforme hautement sécurisée de validation de dossiers de fret et de contrôle de passage de véhicules lourds.
+      {/* 2. Hero Section */}
+      <section id="hero" style={styles.heroSection}>
+        <div style={styles.heroContent}>
+          <span style={styles.heroTagline}>Port Autonome de Cotonou</span>
+          <h1 style={styles.heroTitle}>
+            Modernisez le contrôle et la <br />
+            <span style={{ color: 'var(--primary)' }}>sécurité de vos flux de fret</span>
+          </h1>
+          <p style={styles.heroDescription}>
+            SmartPort Gateway est la plateforme de référence pour la validation en temps réel des laissez-passer, la traçabilité du transit logistique et la supervision des agents de contrôle terrain.
           </p>
-        </div>
-
-        {/* Portals Grid */}
-        <div style={styles.cardsGrid}>
-          {/* Card 1: Admin */}
-          <div onClick={() => { setLoginRole('supervisor'); setView('login'); }} className="glass-interactive" style={styles.card}>
-            <div style={{ ...styles.iconWrapper, backgroundColor: 'var(--secondary-glow)' }}>
-              <LayoutDashboard size={40} color="var(--secondary)" />
-            </div>
-            <h3 style={styles.cardTitle}>Supervision & Administration</h3>
-            <p style={styles.cardDesc}>
-              Gérer les dossiers de fret, valider les codes BESC, analyser les statistiques de passage et administrer les terminaux de contrôle.
-            </p>
-            <button style={{ ...styles.cardBtn, backgroundColor: 'var(--secondary)' }}>Accéder à l'Espace Superviseur</button>
-          </div>
-
-          {/* Card 2: Scanner */}
-          <div onClick={() => { setLoginRole('agent'); setView('login'); }} className="glass-interactive" style={styles.card}>
-            <div style={{ ...styles.iconWrapper, backgroundColor: 'var(--primary-glow)' }}>
-              <Radio size={40} color="var(--primary)" />
-            </div>
-            <h3 style={styles.cardTitle}>Contrôle Terrain / Agent Scan</h3>
-            <p style={styles.cardDesc}>
-              Valider les laissez-passer par scan de QR code, enregistrer les entrées/sorties de fret aux barrières et gérer la file d'attente hors-ligne.
-            </p>
-            <button style={{ ...styles.cardBtn, backgroundColor: 'var(--primary)', color: '#000' }}>Lancer le Terminal de Scan</button>
+          <div style={styles.heroActions}>
+            <button onClick={() => scrollToSection('roles')} style={styles.heroPrimaryBtn}>
+              Accéder aux portails <ArrowRight size={16} style={{ marginLeft: 8 }} />
+            </button>
+            <button onClick={() => scrollToSection('about')} style={styles.heroSecondaryBtn}>
+              En savoir plus
+            </button>
           </div>
         </div>
-
-        {/* Sync Fallback Banner */}
+        
+        {/* Connection sync status if queue exists */}
         {queueSize > 0 && (
-          <div className="glass" style={styles.syncBanner}>
-            <div style={styles.syncBannerLeft}>
-              <Activity size={24} color="var(--warning)'" />
-              <div style={{ marginLeft: 12 }}>
-                <h4 style={{ color: 'var(--warning)', fontWeight: 600 }}>File d'attente hors-ligne active</h4>
-                <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>
-                  Il y a <strong>{queueSize}</strong> scan(s) en attente de synchronisation.
-                </p>
+          <div className="glass" style={styles.syncCardBanner}>
+            <div style={styles.syncCardBannerLeft}>
+              <Activity size={20} color="var(--warning)" style={{ animation: 'pulse 2s infinite' }} />
+              <div style={{ marginLeft: 12, textAlign: 'left' }}>
+                <span style={{ color: 'var(--warning)', fontWeight: 600, fontSize: '0.9rem', display: 'block' }}>
+                  Scans hors-ligne en attente ({queueSize})
+                </span>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+                  Des données ont été enregistrées localement lors d'une déconnexion.
+                </span>
               </div>
             </div>
             <button 
               disabled={!online || isSyncing} 
               onClick={handleSync} 
               style={{ 
-                ...styles.syncBtn, 
+                ...styles.syncActionBtn,
                 opacity: online ? 1 : 0.5,
                 cursor: online ? 'pointer' : 'not-allowed'
               }}
             >
-              <RefreshCw size={16} className={isSyncing ? 'spin' : ''} style={{ marginRight: 8, animation: isSyncing ? 'spin-slow 2s linear infinite' : 'none' }} />
-              {isSyncing ? 'Sync...' : online ? 'Synchroniser maintenant' : 'Hors-ligne - Synchronisation impossible'}
+              <RefreshCw size={14} style={{ marginRight: 6, animation: isSyncing ? 'spin-slow 2s linear infinite' : 'none' }} />
+              {isSyncing ? 'Sync...' : online ? 'Synchroniser' : 'Reconnexion requise'}
             </button>
           </div>
         )}
+      </section>
 
-        {/* Documentation Section */}
-        <section style={styles.docSection}>
-          <div style={styles.docHeader}>
-            <h3 style={styles.docSectionTitle}>Documentation Projet & Spécifications</h3>
-            <p style={styles.docSectionSubtitle}>
-              Découvrez le fonctionnement global de SmartPort Gateway et la répartition des habilitations.
+      {/* 3. À propos (About) Section */}
+      <section id="about" style={styles.section}>
+        <div style={styles.sectionHeader}>
+          <span style={styles.sectionTag}>Contexte & Vision</span>
+          <h2 style={styles.sectionTitle}>Fluidifier et Sécuriser l'Espace Portuaire</h2>
+          <p style={styles.sectionSubtitle}>
+            Face à l'augmentation du trafic de fret au Port Autonome de Cotonou, SmartPort Gateway élimine les goulots d'étranglement et garantit une traçabilité totale à chaque barrière d'accès.
+          </p>
+        </div>
+
+        <div style={styles.aboutGrid}>
+          <div className="glass" style={styles.aboutCard}>
+            <h3 style={styles.aboutCardTitle}>Zéro interruption de service</h3>
+            <p style={styles.aboutCardText}>
+              Les coupures de connexion réseau ne doivent pas bloquer le port. SmartPort Gateway intègre un mécanisme résistant aux pannes permettant aux agents de continuer à travailler hors-ligne.
+            </p>
+          </div>
+          <div className="glass" style={styles.aboutCard}>
+            <h3 style={styles.aboutCardTitle}>Intégrité & Contrôle rigoureux</h3>
+            <p style={styles.aboutCardText}>
+              Chaque entrée ou sortie est vérifiée instantanément par rapport aux dossiers logistiques officiels (codes BESC, données transporteurs) pour écarter tout risque de fraude.
+            </p>
+          </div>
+          <div className="glass" style={styles.aboutCard}>
+            <h3 style={styles.aboutCardTitle}>Audit & Transparence</h3>
+            <p style={styles.aboutCardText}>
+              Toutes les actions des agents terrain sont journalisées avec précision. En cas de litige, les superviseurs disposent d'un historique complet et infalsifiable pour arbitrer rapidement.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Fonctionnalités Clés (Features) Section */}
+      <section id="features" style={{ ...styles.section, backgroundColor: 'rgba(255, 255, 255, 0.01)' }}>
+        <div style={styles.sectionHeader}>
+          <span style={styles.sectionTag}>Fonctionnalités</span>
+          <h2 style={styles.sectionTitle}>Conçu pour le terrain et la supervision</h2>
+          <p style={styles.sectionSubtitle}>
+            Une suite d'outils performants adaptés aux contraintes réelles des opérations portuaires.
+          </p>
+        </div>
+
+        <div style={styles.featuresGrid}>
+          {/* Feature 1 */}
+          <div className="glass" style={styles.featureCard}>
+            <div style={{ ...styles.featureIconContainer, backgroundColor: 'rgba(0, 229, 255, 0.1)' }}>
+              <Scan size={24} color="var(--primary)" />
+            </div>
+            <h3 style={styles.featureTitle}>Scan de QR Code Mobile</h3>
+            <p style={styles.featureText}>
+              Validation instantanée des laissez-passer à l'aide d'une interface de caméra intégrée, optimisée pour les terminaux mobiles des agents de sécurité.
+            </p>
+            <ul style={styles.featureList}>
+              <li><CheckCircle2 size={14} color="var(--primary)" style={{ marginRight: 8 }} /> Lecture rapide et tolérance aux scans difficiles</li>
+              <li><CheckCircle2 size={14} color="var(--primary)" style={{ marginRight: 8 }} /> Extraction immédiate des données du chauffeur</li>
+            </ul>
+          </div>
+
+          {/* Feature 2 */}
+          <div className="glass" style={styles.featureCard}>
+            <div style={{ ...styles.featureIconContainer, backgroundColor: 'rgba(124, 77, 255, 0.1)' }}>
+              <Database size={24} color="var(--secondary)" />
+            </div>
+            <h3 style={styles.featureTitle}>Résilience Offline (Tolérance aux pannes)</h3>
+            <p style={styles.featureText}>
+              Validation locale autonome grâce à un système de mise en cache des dossiers logistiques autorisés directement sur l'appareil de contrôle.
+            </p>
+            <ul style={styles.featureList}>
+              <li><CheckCircle2 size={14} color="var(--secondary)" style={{ marginRight: 8 }} /> Passage transparent en mode dégradé</li>
+              <li><CheckCircle2 size={14} color="var(--secondary)" style={{ marginRight: 8 }} /> File d'attente sécurisée pour la synchronisation</li>
+            </ul>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="glass" style={styles.featureCard}>
+            <div style={{ ...styles.featureIconContainer, backgroundColor: 'rgba(0, 230, 118, 0.1)' }}>
+              <LayoutDashboard size={24} color="var(--success)" />
+            </div>
+            <h3 style={styles.featureTitle}>Supervision Centrale</h3>
+            <p style={styles.featureText}>
+              Suivi consolidé de l'ensemble de l'activité du port avec graphiques de performance, historiques généraux et création de dossiers.
+            </p>
+            <ul style={styles.featureList}>
+              <li><CheckCircle2 size={14} color="var(--success)" style={{ marginRight: 8 }} /> Statistiques détaillées de passage</li>
+              <li><CheckCircle2 size={14} color="var(--success)" style={{ marginRight: 8 }} /> Gestion complète des dossiers logistiques</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Espaces d'accès (Roles Selection) Section */}
+      <section id="roles" style={styles.section}>
+        <div style={styles.sectionHeader}>
+          <span style={styles.sectionTag}>Portail d'accès</span>
+          <h2 style={styles.sectionTitle}>Connectez-vous à votre espace</h2>
+          <p style={styles.sectionSubtitle}>
+            Sélectionnez votre profil d'utilisation pour accéder à votre espace de travail sécurisé.
+          </p>
+        </div>
+
+        <div style={styles.rolesGrid}>
+          {/* Supervisor Card */}
+          <div 
+            onClick={() => { setLoginRole('supervisor'); setView('login'); }} 
+            className="glass-interactive" 
+            style={{ ...styles.roleCard, borderTop: '4px solid var(--secondary)' }}
+          >
+            <div style={{ ...styles.roleIconWrapper, backgroundColor: 'var(--secondary-glow)' }}>
+              <Shield size={36} color="var(--secondary)" />
+            </div>
+            <h3 style={styles.roleCardTitle}>Supervision Logistique</h3>
+            <p style={styles.roleCardDesc}>
+              Pilotez l'ensemble des flux du port, accédez aux graphiques de transit global, gérez les dossiers de fret logistique et contrôlez l'audit.
+            </p>
+            <div style={styles.rolePermissions}>
+              <span style={styles.permissionBadge}>Tableau de bord général</span>
+              <span style={styles.permissionBadge}>Création de dossiers</span>
+              <span style={styles.permissionBadge}>Sécurisé par double facteur (MFA)</span>
+            </div>
+            <button style={{ ...styles.roleBtn, backgroundColor: 'var(--secondary)' }}>
+              Accéder à l'Espace Superviseur <ArrowRight size={14} style={{ marginLeft: 6 }} />
+            </button>
+          </div>
+
+          {/* Agent Card */}
+          <div 
+            onClick={() => { setLoginRole('agent'); setView('login'); }} 
+            className="glass-interactive" 
+            style={{ ...styles.roleCard, borderTop: '4px solid var(--primary)' }}
+          >
+            <div style={{ ...styles.roleIconWrapper, backgroundColor: 'var(--primary-glow)' }}>
+              <Scan size={36} color="var(--primary)" />
+            </div>
+            <h3 style={styles.roleCardTitle}>Agent Contrôle Terrain</h3>
+            <p style={styles.roleCardDesc}>
+              Validez les laissez-passer à la barrière, consultez vos statistiques personnelles de scan et gérez vos transactions hors-ligne.
+            </p>
+            <div style={styles.rolePermissions}>
+              <span style={styles.permissionBadge}>Terminal de scan QR</span>
+              <span style={styles.permissionBadge}>Statistiques personnelles uniquement</span>
+              <span style={styles.permissionBadge}>Fonctionnement hors-ligne</span>
+            </div>
+            <button style={{ ...styles.roleBtn, backgroundColor: 'var(--primary)', color: '#000' }}>
+              Lancer le Terminal de Scan <ArrowRight size={14} style={{ marginLeft: 6 }} />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Footer Section */}
+      <footer style={styles.footer}>
+        <div style={styles.footerMain} className="footer-main-responsive">
+          <div style={styles.footerBrandCol}>
+            <div style={styles.footerBrand}>
+              <Shield size={24} color="var(--primary)" />
+              <span style={styles.footerBrandText}>SmartPort Gateway</span>
+            </div>
+            <p style={styles.footerDesc}>
+              Solution de régulation logistique et de contrôle d'accès intelligente pour les infrastructures portuaires de Cotonou.
             </p>
           </div>
 
-          <div style={styles.docTabs}>
-            <button 
-              onClick={() => setActiveDocTab('tech')}
-              style={{ 
-                ...styles.docTabBtn, 
-                borderColor: activeDocTab === 'tech' ? 'var(--secondary)' : 'transparent',
-                backgroundColor: activeDocTab === 'tech' ? 'rgba(0, 229, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)',
-                color: activeDocTab === 'tech' ? 'var(--secondary)' : 'var(--text-secondary)'
-              }}
-            >
-              <BookOpen size={18} style={{ marginRight: 8 }} />
-              1. Spécifications Techniques & APIs
-            </button>
-            <button 
-              onClick={() => setActiveDocTab('user')}
-              style={{ 
-                ...styles.docTabBtn, 
-                borderColor: activeDocTab === 'user' ? 'var(--primary)' : 'transparent',
-                backgroundColor: activeDocTab === 'user' ? 'rgba(0, 229, 255, 0.08)' : 'rgba(255, 255, 255, 0.02)',
-                color: activeDocTab === 'user' ? 'var(--primary)' : 'var(--text-secondary)'
-              }}
-            >
-              <FileText size={18} style={{ marginRight: 8 }} />
-              2. Guide d'Utilisation & Habilitations
-            </button>
+          <div style={styles.footerLinksCol}>
+            <h4 style={styles.footerColTitle}>Navigation</h4>
+            <ul style={styles.footerLinksList}>
+              <li><button onClick={() => scrollToSection('hero')} style={styles.footerLinkBtn} className="footer-link-btn">Accueil</button></li>
+              <li><button onClick={() => scrollToSection('about')} style={styles.footerLinkBtn} className="footer-link-btn">À propos</button></li>
+              <li><button onClick={() => scrollToSection('features')} style={styles.footerLinkBtn} className="footer-link-btn">Fonctionnalités</button></li>
+              <li><button onClick={() => scrollToSection('roles')} style={styles.footerLinkBtn} className="footer-link-btn">Portails</button></li>
+            </ul>
           </div>
 
-          <div className="glass" style={styles.docContentArea}>
-            {activeDocTab === 'tech' ? (
-              <div style={styles.docLayout}>
-                <div style={styles.docCol}>
-                  <h4 style={{ ...styles.docTitle, color: 'var(--secondary)' }}>
-                    <Server size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-                    Architecture Tri-Protocoles
-                  </h4>
-                  <p style={styles.docText}>
-                    SmartPort Gateway intègre trois types d'APIs pour garantir la traçabilité complète des marchandises transitant par le Port Autonome de Cotonou :
-                  </p>
-                  <ul style={styles.docList}>
-                    <li>
-                      <strong>API REST Laravel (Dossiers) :</strong> Gère l'administration centrale, la validation des BESC et l'authentification sécurisée des superviseurs.
-                    </li>
-                    <li>
-                      <strong>API Next.js (Contrôle Scan) :</strong> Destinée aux barrières physiques pour valider instantanément les QR Codes des chauffeurs avec une faible latence.
-                    </li>
-                    <li>
-                      <strong>Service SOAP Python (PAC Legacy) :</strong> Interconnexion bidirectionnelle avec l'ancien système logistique portuaire pour garantir la compatibilité des données historiques.
-                    </li>
-                  </ul>
-                </div>
-                <div style={styles.docCol}>
-                  <h4 style={{ ...styles.docTitle, color: 'var(--secondary)' }}>
-                    <Activity size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-                    Mécanisme de Résilience (Offline First)
-                  </h4>
-                  <p style={styles.docText}>
-                    Le port devant fonctionner sans interruption, l'application est dotée d'une tolérance aux pannes réseau :
-                  </p>
-                  <ul style={styles.docList}>
-                    <li>
-                      <strong>Détection de Panne :</strong> En cas de perte de connexion avec les serveurs d'API, le système bascule automatiquement et de manière transparente en mode dégradé (Hors-Ligne).
-                    </li>
-                    <li>
-                      <strong>Validation Locale :</strong> L'agent de contrôle terrain peut continuer à scanner les laissez-passer grâce au cache des dossiers stocké dans le navigateur.
-                    </li>
-                    <li>
-                      <strong>File de Synchronisation :</strong> Les transactions validées hors-ligne sont temporisées localement. Dès que le signal réseau est rétabli, un bouton de synchronisation manuelle apparaît sur la page d'accueil pour répercuter les données sur les serveurs centraux.
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            ) : (
-              <div style={styles.docLayout}>
-                <div style={styles.docCol}>
-                  <h4 style={{ ...styles.docTitle, color: 'var(--primary)' }}>
-                    <Key size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-                    Accès à l'Application
-                  </h4>
-                  <p style={styles.docText}>
-                    L'authentification et l'inscription s'effectuent selon le profil requis. Pour accéder aux formulaires de connexion :
-                  </p>
-                  <ul style={styles.docList}>
-                    <li>
-                      Sélectionnez la carte correspondante ci-dessus (Supervision ou Contrôle Terrain).
-                    </li>
-                    <li>
-                      Sur l'écran d'authentification, vous pouvez vous connecter avec vos identifiants existants ou basculer sur l'onglet <strong>Créer un compte</strong> pour vous inscrire.
-                    </li>
-                    <li>
-                      Les superviseurs doivent valider une étape de sécurité supplémentaire par double facteur (MFA) pour accéder à l'administration centrale.
-                    </li>
-                  </ul>
-                </div>
-                <div style={styles.docCol}>
-                  <h4 style={{ ...styles.docTitle, color: 'var(--primary)' }}>
-                    <Users size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-                    Habilitations Strictes par Rôle
-                  </h4>
-                  <p style={styles.docText}>
-                    Une fois connecté, l'espace de travail est rigoureusement compartimenté :
-                  </p>
-                  <ul style={styles.docList}>
-                    <li>
-                      <strong>Le Superviseur :</strong> Dispose du tableau de bord complet (statistiques, graphiques de performance des flux logistiques), de l'historique global de tous les agents et de la gestion des dossiers de transit.
-                    </li>
-                    <li>
-                      <strong>L'Agent de Sécurité Terrain :</strong> N'a aucunement accès au dashboard de supervision ni à la progression et l'historique des autres utilisateurs. Son interface se limite au terminal de scan et à un dashboard personnel présentant uniquement ses propres statistiques de contrôle et son historique de scan local.
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            )}
+          <div style={styles.footerContactCol}>
+            <h4 style={styles.footerColTitle}>Contact & Localisation</h4>
+            <div style={styles.contactItem}>
+              <MapPin size={16} color="var(--primary)" />
+              <span style={styles.contactText}>Port Autonome de Cotonou, Bénin</span>
+            </div>
+            <div style={styles.contactItem}>
+              <Phone size={16} color="var(--primary)" />
+              <span style={styles.contactText}>+229 21 31 52 90</span>
+            </div>
+            <div style={styles.contactItem}>
+              <Info size={16} color="var(--primary)" />
+              <span style={styles.contactText}>Assistance 24h/24 - 7j/7</span>
+            </div>
           </div>
-        </section>
-      </main>
+        </div>
 
-      <footer style={styles.footer}>
-        <p style={styles.footerText}>
-          SmartPort Gateway v2.1.0 • Port Autonome de Cotonou • Système de Tolérance aux Pannes
-        </p>
+        <div style={styles.footerBottom}>
+          <p style={styles.footerBottomText}>
+            © {new Date().getFullYear()} Port Autonome de Cotonou. Tous droits réservés.
+          </p>
+          <span style={styles.versionBadge}>v2.2.0-Prod</span>
+        </div>
       </footer>
     </div>
   );
@@ -252,232 +337,426 @@ export default function Landing({ setView, setLoginRole }) {
 
 const styles = {
   container: {
-    padding: '2rem',
-    maxWidth: '1200px',
-    margin: '0 auto',
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
+    position: 'relative',
+    paddingTop: '80px', // to offset navbar
   },
-  header: {
+  navbar: {
+    position: 'fixed',
+    top: '15px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 'calc(100% - 30px)',
+    maxWidth: '1200px',
+    height: '65px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '3rem',
-    flexWrap: 'wrap',
-    gap: '1.5rem',
+    padding: '0 24px',
+    zIndex: 1000,
+    borderRadius: '16px',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
   },
-  logoContainer: {
+  navLeft: {
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
   },
-  title: {
-    fontSize: '2rem',
+  navLogoText: {
+    fontSize: '1.25rem',
     fontWeight: 700,
-    letterSpacing: '-0.5px',
+    letterSpacing: '-0.3px',
   },
-  statusBadgeContainer: {
+  navLinks: {
     display: 'flex',
+    gap: '24px',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    border: '1px solid var(--bg-card-border)',
-    padding: '8px 16px',
-    borderRadius: '30px',
-    gap: '10px',
   },
-  statusIndicator: {
-    width: '10px',
-    height: '10px',
-    borderRadius: '50%',
-    boxShadow: '0 0 10px currentColor',
-  },
-  statusText: {
-    fontSize: '0.85rem',
+  navLinkBtn: {
+    background: 'none',
+    border: 'none',
     color: 'var(--text-secondary)',
+    cursor: 'pointer',
+    fontSize: '0.9rem',
     fontWeight: 500,
+    transition: 'var(--transition-smooth)',
+    padding: '6px 4px',
   },
-  main: {
+  navRight: {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    gap: '3rem',
+    gap: '16px',
   },
-  welcomeSection: {
-    textAlign: 'center',
-    maxWidth: '800px',
+  apiBadge: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    border: '1px solid',
+    borderRadius: '30px',
+    padding: '4px 12px',
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
   },
-  tagline: {
+  statusDot: {
+    width: '7px',
+    height: '7px',
+    borderRadius: '50%',
+  },
+  navActionBtn: {
+    backgroundColor: 'var(--primary-glow)',
+    border: '1px solid var(--primary)',
+    color: 'var(--primary)',
+    padding: '8px 16px',
+    borderRadius: '8px',
     fontSize: '0.85rem',
     fontWeight: 600,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    transition: 'var(--transition-smooth)',
+  },
+  heroSection: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '6rem 2rem 4rem 2rem',
+    textAlign: 'center',
+    minHeight: '80vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '2.5rem',
+  },
+  heroContent: {
+    maxWidth: '850px',
+  },
+  heroTagline: {
+    fontSize: '0.9rem',
+    fontWeight: 600,
     color: 'var(--primary)',
-    letterSpacing: '2px',
+    letterSpacing: '3px',
     textTransform: 'uppercase',
-    marginBottom: '8px',
+    marginBottom: '16px',
     display: 'block',
   },
-  subTitle: {
-    fontSize: '2.5rem',
+  heroTitle: {
+    fontSize: '3rem',
     fontWeight: 700,
-    marginBottom: '1rem',
-    background: 'linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%)',
+    lineHeight: 1.2,
+    letterSpacing: '-1px',
+    marginBottom: '1.5rem',
+    background: 'linear-gradient(135deg, #fff 40%, var(--text-secondary) 100%)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
   },
-  description: {
+  heroDescription: {
     color: 'var(--text-secondary)',
-    fontSize: '1.1rem',
+    fontSize: '1.15rem',
     lineHeight: 1.6,
+    marginBottom: '2.5rem',
   },
-  cardsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-    gap: '2rem',
-    width: '100%',
-    maxWidth: '900px',
-  },
-  card: {
-    padding: '2.5rem',
+  heroActions: {
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    cursor: 'pointer',
-    position: 'relative',
-    overflow: 'hidden',
+    justifyContent: 'center',
+    gap: '16px',
+    flexWrap: 'wrap',
   },
-  iconWrapper: {
-    padding: '16px',
-    borderRadius: '16px',
-    marginBottom: '1.5rem',
-  },
-  cardTitle: {
-    fontSize: '1.4rem',
-    fontWeight: 600,
-    marginBottom: '1rem',
-  },
-  cardDesc: {
-    color: 'var(--text-secondary)',
-    lineHeight: 1.5,
-    fontSize: '0.95rem',
-    marginBottom: '2rem',
-    flexGrow: 1,
-  },
-  cardBtn: {
+  heroPrimaryBtn: {
+    backgroundColor: 'var(--primary)',
+    color: '#000',
     border: 'none',
-    padding: '12px 24px',
+    padding: '14px 28px',
     borderRadius: '10px',
     fontWeight: 600,
-    fontSize: '0.9rem',
+    fontSize: '0.95rem',
     cursor: 'pointer',
-    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
     transition: 'var(--transition-smooth)',
-    color: '#fff',
+    boxShadow: '0 4px 14px rgba(0, 229, 255, 0.3)',
   },
-  syncBanner: {
+  heroSecondaryBtn: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    color: '#fff',
+    border: '1px solid var(--bg-card-border)',
+    padding: '14px 28px',
+    borderRadius: '10px',
+    fontWeight: 600,
+    fontSize: '0.95rem',
+    cursor: 'pointer',
+    transition: 'var(--transition-smooth)',
+  },
+  syncCardBanner: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    padding: '12px 20px',
     width: '100%',
-    maxWidth: '900px',
-    padding: '1.5rem',
+    maxWidth: '750px',
     borderLeft: '4px solid var(--warning)',
-    flexWrap: 'wrap',
-    gap: '1rem',
+    borderRadius: '12px',
+    gap: '16px',
   },
-  syncBannerLeft: {
+  syncCardBannerLeft: {
     display: 'flex',
     alignItems: 'center',
   },
-  syncBtn: {
+  syncActionBtn: {
     display: 'flex',
     alignItems: 'center',
     backgroundColor: 'transparent',
     border: '1px solid var(--warning)',
     color: 'var(--warning)',
-    padding: '8px 16px',
-    borderRadius: '8px',
-    fontSize: '0.85rem',
+    padding: '6px 14px',
+    borderRadius: '6px',
+    fontSize: '0.8rem',
     fontWeight: 600,
     transition: 'var(--transition-smooth)',
   },
-  docSection: {
+  section: {
+    padding: '6rem 2rem',
+    maxWidth: '1200px',
+    margin: '0 auto',
     width: '100%',
-    maxWidth: '900px',
-    marginTop: '1rem',
   },
-  docHeader: {
+  sectionHeader: {
     textAlign: 'center',
-    marginBottom: '2rem',
+    maxWidth: '700px',
+    margin: '0 auto 4rem auto',
   },
-  docSectionTitle: {
-    fontSize: '1.6rem',
+  sectionTag: {
+    fontSize: '0.8rem',
+    fontWeight: 600,
+    color: 'var(--secondary)',
+    letterSpacing: '2px',
+    textTransform: 'uppercase',
+    marginBottom: '8px',
+    display: 'block',
+  },
+  sectionTitle: {
+    fontSize: '2rem',
     fontWeight: 700,
-    marginBottom: '0.5rem',
-  },
-  docSectionSubtitle: {
-    fontSize: '0.95rem',
-    color: 'var(--text-secondary)',
-  },
-  docTabs: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '1rem',
     marginBottom: '1rem',
   },
-  docTabBtn: {
-    padding: '1rem',
-    borderRadius: '12px',
-    border: '1px solid',
-    fontSize: '0.95rem',
+  sectionSubtitle: {
+    color: 'var(--text-secondary)',
+    fontSize: '1rem',
+    lineHeight: 1.5,
+  },
+  aboutGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+    gap: '2rem',
+  },
+  aboutCard: {
+    padding: '2.5rem 2rem',
+    borderRadius: '16px',
+    textAlign: 'left',
+  },
+  aboutCardTitle: {
+    fontSize: '1.2rem',
     fontWeight: 600,
-    cursor: 'pointer',
+    marginBottom: '1rem',
+    color: '#fff',
+  },
+  aboutCardText: {
+    color: 'var(--text-secondary)',
+    fontSize: '0.95rem',
+    lineHeight: 1.6,
+  },
+  featuresGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+    gap: '2rem',
+  },
+  featureCard: {
+    padding: '2.5rem 2rem',
+    textAlign: 'left',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.2rem',
+  },
+  featureIconContainer: {
+    width: '50px',
+    height: '50px',
+    borderRadius: '12px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  featureTitle: {
+    fontSize: '1.3rem',
+    fontWeight: 600,
+  },
+  featureText: {
+    color: 'var(--text-secondary)',
+    fontSize: '0.95rem',
+    lineHeight: 1.5,
+  },
+  featureList: {
+    listStyle: 'none',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    fontSize: '0.9rem',
+    color: 'var(--text-secondary)',
+    marginTop: 'auto',
+  },
+  rolesGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+    gap: '2.5rem',
+    maxWidth: '900px',
+    margin: '0 auto',
+  },
+  roleCard: {
+    padding: '3rem 2.5rem',
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: '1.5rem',
+  },
+  roleIconWrapper: {
+    padding: '14px',
+    borderRadius: '12px',
+  },
+  roleCardTitle: {
+    fontSize: '1.5rem',
+    fontWeight: 600,
+  },
+  roleCardDesc: {
+    color: 'var(--text-secondary)',
+    fontSize: '0.95rem',
+    lineHeight: 1.5,
+    minHeight: '70px',
+  },
+  rolePermissions: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    width: '100%',
+  },
+  permissionBadge: {
+    fontSize: '0.8rem',
+    color: 'var(--text-secondary)',
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    padding: '6px 12px',
+    borderRadius: '6px',
+    border: '1px solid rgba(255,255,255,0.03)',
+    width: 'fit-content',
+  },
+  roleBtn: {
+    border: 'none',
+    padding: '12px 24px',
+    borderRadius: '8px',
+    fontWeight: 600,
+    fontSize: '0.9rem',
+    cursor: 'pointer',
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#fff',
+    marginTop: '1rem',
     transition: 'var(--transition-smooth)',
   },
-  docContentArea: {
-    padding: '2.5rem 2rem',
+  footer: {
+    borderTop: '1px solid var(--bg-card-border)',
+    backgroundColor: 'rgba(11, 15, 25, 0.8)',
+    backdropFilter: 'blur(10px)',
+    padding: '4rem 2rem 2rem 2rem',
+    marginTop: 'auto',
   },
-  docLayout: {
+  footerMain: {
+    maxWidth: '1200px',
+    margin: '0 auto',
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-    gap: '2.5rem',
+    gridTemplateColumns: '2fr 1fr 1.5fr',
+    gap: '4rem',
+    marginBottom: '3rem',
   },
-  docCol: {
+  footerBrandCol: {
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
   },
-  docTitle: {
-    fontSize: '1.15rem',
-    fontWeight: 600,
+  footerBrand: {
     display: 'flex',
     alignItems: 'center',
+    gap: '8px',
   },
-  docText: {
-    fontSize: '0.9rem',
-    color: 'var(--text-secondary)',
-    lineHeight: 1.6,
+  footerBrandText: {
+    fontSize: '1.2rem',
+    fontWeight: 700,
   },
-  docList: {
-    fontSize: '0.9rem',
+  footerDesc: {
     color: 'var(--text-secondary)',
-    lineHeight: 1.6,
-    paddingLeft: '1.25rem',
+    fontSize: '0.9rem',
+    lineHeight: 1.5,
+    maxWidth: '320px',
+  },
+  footerLinksCol: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '0.75rem',
+    gap: '1.2rem',
   },
-  footer: {
-    padding: '2rem',
-    textAlign: 'center',
-    borderTop: '1px solid var(--bg-card-border)',
-    marginTop: '3rem',
+  footerColTitle: {
+    fontSize: '1rem',
+    fontWeight: 600,
+    color: '#fff',
   },
-  footerText: {
+  footerLinksList: {
+    listStyle: 'none',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  footerLinkBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--text-muted)',
+    cursor: 'pointer',
+    fontSize: '0.9rem',
+    textAlign: 'left',
+    transition: 'var(--transition-smooth)',
+  },
+  footerContactCol: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.2rem',
+  },
+  contactItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  contactText: {
+    fontSize: '0.9rem',
+    color: 'var(--text-secondary)',
+  },
+  footerBottom: {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+    paddingTop: '2rem',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '1rem',
+  },
+  footerBottomText: {
+    fontSize: '0.8rem',
+    color: 'var(--text-muted)',
+  },
+  versionBadge: {
     fontSize: '0.75rem',
     color: 'var(--text-muted)',
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    padding: '3px 8px',
+    borderRadius: '4px',
+    border: '1px solid rgba(255, 255, 255, 0.04)',
   }
 };

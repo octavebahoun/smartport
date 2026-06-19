@@ -12,71 +12,7 @@ export default function Dashboard({ setView, onLogout }) {
   const [isSyncing, setIsSyncing] = useState(false);
   const [fallbackMode, setFallbackMode] = useState(false);
 
-  // SOAP testing tool states
-  const [soapRef, setSoapRef] = useState('SOAP_TEST_123');
-  const [soapStatus, setSoapStatus] = useState('VALIDE');
-  const [soapType, setSoapType] = useState('IMPORT');
-  const [soapLoading, setSoapLoading] = useState(false);
-  const [soapResult, setSoapResult] = useState(null);
 
-  const handleSoapGet = async () => {
-    setSoapLoading(true);
-    setSoapResult(null);
-    try {
-      const res = await apiService.soapClient.getDossier(soapRef);
-      setSoapResult({
-        action: 'GetDossier',
-        endpoint: apiService.soapClient.getSoapUrl(),
-        ...res
-      });
-    } catch (err) {
-      setSoapResult({
-        action: 'GetDossier',
-        endpoint: apiService.soapClient.getSoapUrl(),
-        success: false,
-        error: err.message
-      });
-    } finally {
-      setSoapLoading(false);
-    }
-  };
-
-  const handleSoapCreate = async () => {
-    setSoapLoading(true);
-    setSoapResult(null);
-    try {
-      const res = await apiService.soapClient.createDossier(soapRef, soapStatus, soapType);
-      setSoapResult({
-        action: 'CreateDossier',
-        endpoint: apiService.soapClient.getSoapUrl(),
-        ...res
-      });
-    } catch (err) {
-      setSoapResult({
-        action: 'CreateDossier',
-        endpoint: apiService.soapClient.getSoapUrl(),
-        success: false,
-        error: err.message
-      });
-    } finally {
-      setSoapLoading(false);
-    }
-  };
-
-  const getSentRequestXml = () => {
-    if (!soapResult) return '';
-    const payload = soapResult.action === 'GetDossier'
-      ? `<GetDossierRequest>\n         <reference_metier>${soapRef}</reference_metier>\n      </GetDossierRequest>`
-      : `<CreateDossierRequest>\n         <reference_metier>${soapRef}</reference_metier>\n         <statut>${soapStatus}</statut>\n         <type_operation>${soapType}</type_operation>\n      </CreateDossierRequest>`;
-      
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:smart="http://smartport.lacotonou.bj/">
-   <soapenv:Header/>
-   <soapenv:Body>
-      ${payload}
-   </soapenv:Body>
-</soapenv:Envelope>`;
-  };
 
   // Form state
   const [newDossier, setNewDossier] = useState({
@@ -190,9 +126,7 @@ export default function Dashboard({ setView, onLogout }) {
               API: {online ? 'Opérationnelle' : 'Déconnectée'}
             </span>
           </div>
-          <button onClick={toggleOnline} style={styles.toggleBtn}>
-            Simuler {online ? 'Coupure API' : 'Connexion API'}
-          </button>
+
         </div>
       </header>
 
@@ -265,12 +199,7 @@ export default function Dashboard({ setView, onLogout }) {
         >
           Journaux d'Audit & Accès
         </button>
-        <button 
-          onClick={() => setActiveTab('soap')} 
-          style={{ ...styles.tabBtn, borderBottom: activeTab === 'soap' ? '2px solid var(--primary)' : 'none', color: activeTab === 'soap' ? 'var(--primary)' : 'var(--text-secondary)' }}
-        >
-          Intégration SOAP (PAC Legacy)
-        </button>
+
       </div>
 
       {/* Tab Contents */}
@@ -308,7 +237,7 @@ export default function Dashboard({ setView, onLogout }) {
                 </thead>
                 <tbody>
                   {dossiers.map((d, index) => (
-                    <tr key={index} style={styles.tr}>
+                    <tr key={index} style={styles.tr} className="dashboard-tr">
                       <td style={{ ...styles.td, fontWeight: 'bold' }}>{d.number}</td>
                       <td style={styles.td}>{d.client}</td>
                       <td style={styles.td}>
@@ -364,7 +293,7 @@ export default function Dashboard({ setView, onLogout }) {
                 </thead>
                 <tbody>
                   {logs.map((log, index) => (
-                    <tr key={index} style={styles.tr}>
+                    <tr key={index} style={styles.tr} className="dashboard-tr">
                       <td style={styles.td}>{new Date(log.timestamp).toLocaleString()}</td>
                       <td style={styles.td}>{log.gateway}</td>
                       <td style={styles.td}>{log.driver}</td>
@@ -397,154 +326,7 @@ export default function Dashboard({ setView, onLogout }) {
           </div>
         )}
 
-        {activeTab === 'soap' && (
-          <div style={styles.soapTab}>
-            <div style={styles.soapHeader}>
-              <h3 style={styles.tableTitle}>Port PAC Legacy - Terminal de Test Connecteur SOAP</h3>
-              <p style={styles.soapSub}>
-                Ce module interagit directement avec le serveur d'intégration SOAP du Port Autonome de Cotonou configuré à l'adresse :{' '}
-                <code style={styles.codeBadge}>{apiService.soapClient.getSoapUrl()}</code>
-              </p>
-            </div>
 
-            <div style={styles.soapGrid}>
-              {/* Formulaire de test SOAP */}
-              <div style={styles.soapFormCard}>
-                <h4 style={styles.soapPanelTitle}>Paramètres de la requête</h4>
-                
-                <div style={styles.formGroup}>
-                  <label style={styles.formLabel}>Référence Métier (Dossier)</label>
-                  <div style={styles.inputWithSuggestions}>
-                    <input 
-                      type="text" 
-                      value={soapRef} 
-                      onChange={e => setSoapRef(e.target.value)} 
-                      style={styles.formInput} 
-                      placeholder="ex: SOAP_TEST_123"
-                    />
-                    {dossiers.length > 0 && (
-                      <div style={styles.suggestionsContainer}>
-                        <span style={styles.suggestionLabel}>Raccourcis :</span>
-                        {dossiers.slice(0, 3).map((d, i) => (
-                          <button 
-                            key={i} 
-                            type="button" 
-                            onClick={() => setSoapRef(d.number || d.reference_metier)}
-                            style={styles.suggestionBtn}
-                          >
-                            {d.number || d.reference_metier}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div style={styles.formRow}>
-                  <div style={styles.formGroup} className="flex-1">
-                    <label style={styles.formLabel}>Statut (pour CreateDossier)</label>
-                    <select 
-                      value={soapStatus} 
-                      onChange={e => setSoapStatus(e.target.value)} 
-                      style={styles.formInput}
-                    >
-                      <option value="VALIDE">VALIDE</option>
-                      <option value="LITIGE">LITIGE</option>
-                      <option value="BROUILLON">BROUILLON</option>
-                      <option value="VALIDE_EXTERNE">VALIDE_EXTERNE</option>
-                    </select>
-                  </div>
-
-                  <div style={styles.formGroup} className="flex-1">
-                    <label style={styles.formLabel}>Type d'Opération (pour CreateDossier)</label>
-                    <select 
-                      value={soapType} 
-                      onChange={e => setSoapType(e.target.value)} 
-                      style={styles.formInput}
-                    >
-                      <option value="IMPORT">IMPORT</option>
-                      <option value="EXPORT">EXPORT</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={styles.soapActions}>
-                  <button 
-                    type="button" 
-                    onClick={handleSoapGet} 
-                    disabled={soapLoading} 
-                    style={styles.soapBtnGet}
-                  >
-                    {soapLoading ? 'Appel en cours...' : 'Consulter (GetDossier)'}
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={handleSoapCreate} 
-                    disabled={soapLoading} 
-                    style={styles.soapBtnCreate}
-                  >
-                    {soapLoading ? 'Appel en cours...' : 'Créer / Mettre à jour (CreateDossier)'}
-                  </button>
-                </div>
-              </div>
-
-              {/* Inspecteur SOAP */}
-              <div style={styles.soapInspectorCard}>
-                <h4 style={styles.soapPanelTitle}>Inspecteur SOAP & Trame XML</h4>
-                
-                {!soapResult && !soapLoading && (
-                  <div style={styles.emptyInspector}>
-                    <Database size={40} color="var(--text-muted)" />
-                    <p style={{ marginTop: '10px' }}>Lancez une opération SOAP pour visualiser les enveloppes XML de requêtes et de réponses en temps réel.</p>
-                  </div>
-                )}
-
-                {soapLoading && (
-                  <div style={styles.emptyInspector}>
-                    <RefreshCw size={40} color="var(--primary)" style={{ animation: 'spin-slow 2s linear infinite' }} />
-                    <p style={{ marginTop: '10px' }}>Envoi de la trame XML en cours...</p>
-                  </div>
-                )}
-
-                {soapResult && (
-                  <div style={styles.resultContainer}>
-                    <div style={{
-                      ...styles.resultStatusBar,
-                      backgroundColor: soapResult.success ? 'var(--success-glow)' : 'var(--error-glow)',
-                      borderColor: soapResult.success ? 'var(--success)' : 'var(--error)',
-                    }}>
-                      <span style={{ fontWeight: 'bold', color: soapResult.success ? 'var(--success)' : 'var(--error)' }}>
-                        {soapResult.success ? 'SUCCÈS' : 'ÉCHEC'} (HTTP {soapResult.status || 'ERR'})
-                      </span>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                        Action: {soapResult.action}
-                      </span>
-                    </div>
-
-                    <div style={styles.inspectorSection}>
-                      <span style={styles.sectionLabel}>Données analysées (JSON) :</span>
-                      <pre style={styles.jsonBlock}>
-                        {JSON.stringify(soapResult.parsed || { error: soapResult.error || 'Aucune donnée retournée' }, null, 2)}
-                      </pre>
-                    </div>
-
-                    <div style={styles.inspectorSection}>
-                      <span style={styles.sectionLabel}>Enveloppe de la requête XML envoyée :</span>
-                      <pre style={styles.xmlBlock}>{getSentRequestXml()}</pre>
-                    </div>
-
-                    {soapResult.xml && (
-                      <div style={styles.inspectorSection}>
-                        <span style={styles.sectionLabel}>Enveloppe de la réponse XML reçue :</span>
-                        <pre style={styles.xmlBlock}>{soapResult.xml}</pre>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </main>
 
       {/* Creation Modal */}
@@ -785,9 +567,6 @@ const styles = {
   tr: {
     borderBottom: '1px solid rgba(255,255,255,0.02)',
     transition: 'var(--transition-smooth)',
-    ':hover': {
-      backgroundColor: 'rgba(255,255,255,0.01)',
-    }
   },
   td: {
     padding: '14px 16px',
@@ -892,169 +671,5 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer',
   },
-  soapTab: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.5rem',
-  },
-  soapHeader: {
-    borderBottom: '1px solid var(--bg-card-border)',
-    paddingBottom: '1rem',
-  },
-  soapSub: {
-    fontSize: '0.85rem',
-    color: 'var(--text-secondary)',
-    marginTop: '0.25rem',
-  },
-  codeBadge: {
-    fontFamily: 'monospace',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    padding: '2px 6px',
-    borderRadius: '4px',
-    color: 'var(--primary)',
-  },
-  soapGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1.2fr',
-    gap: '1.5rem',
-  },
-  soapFormCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-    border: '1px solid var(--bg-card-border)',
-    borderRadius: '12px',
-    padding: '1.5rem',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-  },
-  soapPanelTitle: {
-    fontSize: '1rem',
-    fontWeight: 600,
-    color: 'var(--text-primary)',
-    marginBottom: '0.5rem',
-    borderBottom: '1px solid rgba(255,255,255,0.05)',
-    paddingBottom: '0.5rem',
-  },
-  soapInspectorCard: {
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    border: '1px solid var(--bg-card-border)',
-    borderRadius: '12px',
-    padding: '1.5rem',
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '400px',
-  },
-  emptyInspector: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    textAlign: 'center',
-    color: 'var(--text-secondary)',
-    fontSize: '0.9rem',
-    padding: '2rem',
-  },
-  resultContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    flex: 1,
-  },
-  resultStatusBar: {
-    padding: '8px 12px',
-    borderRadius: '6px',
-    border: '1px solid',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  inspectorSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  sectionLabel: {
-    fontSize: '0.8rem',
-    fontWeight: 500,
-    color: 'var(--text-secondary)',
-  },
-  jsonBlock: {
-    margin: 0,
-    padding: '10px',
-    borderRadius: '6px',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    color: 'var(--primary)',
-    fontFamily: 'monospace',
-    fontSize: '0.85rem',
-    overflowX: 'auto',
-    border: '1px solid rgba(255,255,255,0.05)',
-  },
-  xmlBlock: {
-    margin: 0,
-    padding: '10px',
-    borderRadius: '6px',
-    backgroundColor: '#0a0d14',
-    color: '#a9b1d6',
-    fontFamily: 'monospace',
-    fontSize: '0.8rem',
-    overflowX: 'auto',
-    maxHeight: '200px',
-    overflowY: 'auto',
-    border: '1px solid rgba(255,255,255,0.05)',
-  },
-  formRow: {
-    display: 'flex',
-    gap: '1rem',
-  },
-  inputWithSuggestions: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  suggestionsContainer: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '6px',
-    alignItems: 'center',
-    marginTop: '2px',
-  },
-  suggestionLabel: {
-    fontSize: '0.75rem',
-    color: 'var(--text-muted)',
-  },
-  suggestionBtn: {
-    fontSize: '0.7rem',
-    padding: '2px 8px',
-    borderRadius: '10px',
-    border: '1px solid var(--bg-card-border)',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    color: 'var(--primary)',
-    cursor: 'pointer',
-  },
-  soapActions: {
-    display: 'flex',
-    gap: '10px',
-    marginTop: '0.5rem',
-  },
-  soapBtnGet: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    border: '1px solid var(--bg-card-border)',
-    color: '#fff',
-    padding: '10px',
-    borderRadius: '8px',
-    fontWeight: 600,
-    cursor: 'pointer',
-  },
-  soapBtnCreate: {
-    flex: 1,
-    backgroundColor: 'var(--primary)',
-    border: 'none',
-    color: '#000',
-    padding: '10px',
-    borderRadius: '8px',
-    fontWeight: 600,
-    cursor: 'pointer',
-  }
+
 };

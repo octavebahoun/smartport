@@ -136,7 +136,7 @@ export default function Scanner({ setView, onLogout }) {
               <p style={styles.shortcutLabel}>Simulations rapides :</p>
               <div style={styles.shortcutGrid}>
                 {testCodes.map((tc, idx) => (
-                  <button key={idx} onClick={() => { setQrInput(tc.code); handleScan(tc.code); }} style={styles.shortcutBtn}>
+                  <button key={idx} onClick={() => { setQrInput(tc.code); handleScan(tc.code); }} style={styles.shortcutBtn} className="shortcut-btn">
                     {tc.name}
                   </button>
                 ))}
@@ -415,9 +415,6 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    ':hover': {
-      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    }
   },
   resultSection: {
     display: 'flex',

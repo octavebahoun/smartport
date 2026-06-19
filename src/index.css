@@ -117,3 +117,37 @@ body {
     transform: rotate(360deg);
   }
 }
+
+/* Custom interactive hover state classes */
+.nav-link-btn:hover {
+  color: #fff !important;
+}
+
+.nav-action-btn:hover {
+  background-color: var(--primary) !important;
+  color: #000 !important;
+}
+
+.footer-link-btn:hover {
+  color: #fff !important;
+}
+
+/* Responsive adjustments for Landing Page */
+@media (max-width: 768px) {
+  .nav-links-responsive {
+    display: none !important;
+  }
+  .footer-main-responsive {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+}
+
+.dashboard-tr:hover {
+  background-color: rgba(255, 255, 255, 0.01) !important;
+}
+
+.shortcut-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
