@@ -392,17 +392,6 @@ export default function Login({ setView, initialRole, onLoginSuccess }) {
             }
           </button>
         </form>
-
-        {mode === 'login' && (
-          <div style={styles.infoBox}>
-            <p style={styles.infoText}>
-              💡 <strong>Comportement Fallback/Mock :</strong><br />
-              Si l'API locale est éteinte, vous pouvez vous connecter avec :<br />
-              • Superviseur : <code>supervisor@smartport.gov</code> / <code>supersecure123</code> (MFA: n'importe quel code)<br />
-              • Agent : <code>agent@smartport.gov</code> / <code>fieldsecure123</code>
-            </p>
-          </div>
-        )}
       </main>
     </div>
   );

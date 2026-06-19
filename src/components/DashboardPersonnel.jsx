@@ -1,23 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { QrCode, Eye, LogOut, User, Smartphone, Shield, Wifi, WifiOff, ArrowRight } from 'lucide-react';
+import { QrCode, Eye, LogOut, User, Smartphone, Shield, Wifi, WifiOff, ArrowRight, Activity, Wifi as WifiIcon } from 'lucide-react';
 import { apiService } from '../services/api';
 
 export default function DashboardPersonnel({ user, setView, onLogout }) {
   const [online, setOnline] = useState(apiService.isOnline());
+  const [agentLogs, setAgentLogs] = useState([]);
+  const [stats, setStats] = useState({ total: 0, offline: 0, authorized: 0, refused: 0 });
 
   useEffect(() => {
     const handleConnection = () => {
       setOnline(apiService.isOnline());
     };
     window.addEventListener('smartport_connection_changed', handleConnection);
+    
+    // Fetch and filter logs for agent
+    if (user?.role === 'agent') {
+      apiService.getLogs().then(logs => {
+        const filtered = logs.filter(log => log.agentEmail === user.email);
+        setAgentLogs(filtered);
+        
+        const total = filtered.length;
+        const offline = filtered.filter(l => l.offline).length;
+        const authorized = filtered.filter(l => l.status === 'AUTORISE').length;
+        const refused = filtered.filter(l => l.status === 'REFUSE').length;
+        setStats({ total, offline, authorized, refused });
+      });
+    }
+
     return () => {
       window.removeEventListener('smartport_connection_changed', handleConnection);
     };
-  }, []);
-
-  const handleToggleOnline = () => {
-    apiService.toggleOnlineStatus();
-  };
+  }, [user]);
 
   return (
     <div style={styles.container}>
@@ -28,19 +41,19 @@ export default function DashboardPersonnel({ user, setView, onLogout }) {
           <span style={styles.logoText}>SmartPort Hub</span>
         </div>
         <div style={styles.headerRight}>
-          <button 
-            onClick={handleToggleOnline} 
+          <div 
             style={{
               ...styles.apiBadge,
               borderColor: online ? 'var(--success)' : 'var(--error)',
               backgroundColor: online ? 'var(--success-glow)' : 'var(--error-glow)',
+              cursor: 'default'
             }}
           >
             {online ? <Wifi size={14} color="var(--success)" /> : <WifiOff size={14} color="var(--error)" />}
             <span style={{ color: online ? 'var(--success)' : 'var(--error)', fontWeight: 600 }}>
               {online ? 'En Ligne' : 'Mode Dégradé'}
             </span>
-          </button>
+          </div>
           <button onClick={onLogout} style={styles.logoutBtn} title="Se déconnecter">
             <LogOut size={18} />
             <span style={styles.logoutText}>Déconnexion</span>
@@ -73,7 +86,7 @@ export default function DashboardPersonnel({ user, setView, onLogout }) {
             {user?.role === 'agent' && (
               <div style={styles.metaItem}>
                 <span style={styles.metaLabel}>Terminal Matériel</span>
-                <span style={styles.metaValue} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ ...styles.metaValue, display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Smartphone size={14} color="var(--primary)" />
                   {user?.hardwareId || 'TERM-PAC-8001'}
                 </span>
@@ -95,13 +108,18 @@ export default function DashboardPersonnel({ user, setView, onLogout }) {
         </div>
 
         {/* Portals Grid */}
-        <div style={styles.portalsGrid}>
+        <div style={{
+          ...styles.portalsGrid,
+          gridTemplateColumns: user?.role === 'supervisor' ? 'repeat(auto-fit, minmax(300px, 1fr))' : '1fr'
+        }}>
           {/* Scanner Portal Card */}
           <div 
             className="glass glass-interactive" 
             style={{
               ...styles.portalCard,
-              borderTop: '4px solid var(--primary)'
+              borderTop: '4px solid var(--primary)',
+              maxWidth: user?.role === 'supervisor' ? 'none' : '500px',
+              margin: user?.role === 'supervisor' ? '0' : '0 auto'
             }}
             onClick={() => setView('scanner')}
           >
@@ -118,28 +136,126 @@ export default function DashboardPersonnel({ user, setView, onLogout }) {
             </div>
           </div>
 
-          {/* Supervisor Portal Card */}
-          <div 
-            className="glass glass-interactive" 
-            style={{
-              ...styles.portalCard,
-              borderTop: '4px solid var(--secondary)'
-            }}
-            onClick={() => setView('dashboard')}
-          >
-            <div style={{ ...styles.iconContainer, backgroundColor: 'var(--secondary-glow)' }}>
-              <Eye size={32} color="var(--secondary)" />
+          {/* Supervisor Portal Card (Only visible to supervisor) */}
+          {user?.role === 'supervisor' && (
+            <div 
+              className="glass glass-interactive" 
+              style={{
+                ...styles.portalCard,
+                borderTop: '4px solid var(--secondary)'
+              }}
+              onClick={() => setView('dashboard')}
+            >
+              <div style={{ ...styles.iconContainer, backgroundColor: 'var(--secondary-glow)' }}>
+                <Eye size={32} color="var(--secondary)" />
+              </div>
+              <h3 style={styles.portalTitle}>Superviser & Analyser</h3>
+              <p style={styles.portalDesc}>
+                Consulter les dossiers de transit, valider les BESC en litige, visualiser l'historique des contrôles et exporter les rapports.
+              </p>
+              <div style={{ ...styles.portalAction, color: 'var(--secondary)' }}>
+                <span>Ouvrir la Supervision</span>
+                <ArrowRight size={16} />
+              </div>
             </div>
-            <h3 style={styles.portalTitle}>Superviser & Analyser</h3>
-            <p style={styles.portalDesc}>
-              Consulter les dossiers de transit, valider les BESC en litige, visualiser l'historique des contrôles et exporter les rapports.
-            </p>
-            <div style={{ ...styles.portalAction, color: 'var(--secondary)' }}>
-              <span>Ouvrir la Supervision</span>
-              <ArrowRight size={16} />
-            </div>
-          </div>
+          )}
         </div>
+
+        {/* Agent Personal Statistics Dashboard */}
+        {user?.role === 'agent' && (
+          <section className="glass" style={styles.agentDashboard}>
+            <div style={styles.agentDashboardHeader}>
+              <Activity size={20} color="var(--primary)" />
+              <h3 style={styles.agentDashboardTitle}>Mon Tableau de Bord (Statistiques de Contrôle)</h3>
+            </div>
+            <p style={styles.agentDashboardDesc}>
+              Voici un aperçu de vos activités de scan récentes. Vous n'avez pas accès aux statistiques globales du port ni à la progression des autres terminaux.
+            </p>
+
+            {/* Metrics Row */}
+            <div style={styles.agentMetricsGrid}>
+              <div style={styles.metricBox}>
+                <span style={styles.metricLabel}>Total Scans</span>
+                <span style={styles.metricVal}>{stats.total}</span>
+              </div>
+              <div style={styles.metricBox}>
+                <span style={styles.metricLabel}>Scans Hors-Ligne</span>
+                <span style={{ ...styles.metricVal, color: stats.offline > 0 ? 'var(--warning)' : 'var(--text-primary)' }}>
+                  {stats.offline}
+                </span>
+              </div>
+              <div style={styles.metricBox}>
+                <span style={styles.metricLabel}>Validations Autorisées</span>
+                <span style={{ ...styles.metricVal, color: 'var(--success)' }}>{stats.authorized}</span>
+              </div>
+              <div style={styles.metricBox}>
+                <span style={styles.metricLabel}>Passages Refusés</span>
+                <span style={{ ...styles.metricVal, color: 'var(--error)' }}>{stats.refused}</span>
+              </div>
+            </div>
+
+            {/* Recent Scans Table */}
+            <div style={{ marginTop: '1.5rem' }}>
+              <h4 style={styles.tableTitle}>Mes 5 derniers scans</h4>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={styles.table}>
+                  <thead>
+                    <tr>
+                      <th style={styles.th}>Heure</th>
+                      <th style={styles.th}>Chauffeur</th>
+                      <th style={styles.th}>Plaque</th>
+                      <th style={styles.th}>Statut</th>
+                      <th style={styles.th}>Type</th>
+                      <th style={styles.th}>Mode</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {agentLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" style={styles.tdEmpty}>Aucun scan enregistré aujourd'hui.</td>
+                      </tr>
+                    ) : (
+                      agentLogs.slice(0, 5).map(log => (
+                        <tr key={log.id}>
+                          <td style={styles.td}>
+                            {new Date(log.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                          </td>
+                          <td style={styles.td}>{log.driver}</td>
+                          <td style={styles.td}>{log.license}</td>
+                          <td style={styles.td}>
+                            <span style={{
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              backgroundColor: log.status === 'AUTORISE' ? 'var(--success-glow)' : 'var(--error-glow)',
+                              color: log.status === 'AUTORISE' ? 'var(--success)' : 'var(--error)',
+                              border: `1px solid ${log.status === 'AUTORISE' ? 'rgba(0, 230, 118, 0.2)' : 'rgba(255, 23, 68, 0.2)'}`
+                            }}>
+                              {log.status}
+                            </span>
+                          </td>
+                          <td style={styles.td}>{log.type}</td>
+                          <td style={styles.td}>
+                            {log.offline ? (
+                              <span style={{ color: 'var(--warning)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <WifiOff size={12} /> Hors-ligne
+                              </span>
+                            ) : (
+                              <span style={{ color: 'var(--success)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Wifi size={12} /> Synchrone
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
 
       {/* Footer info box */}
@@ -197,7 +313,6 @@ const styles = {
     padding: '6px 14px',
     borderRadius: '20px',
     fontSize: '0.8rem',
-    cursor: 'pointer',
     transition: 'var(--transition-smooth)',
   },
   logoutBtn: {
@@ -213,15 +328,9 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer',
     transition: 'var(--transition-smooth)',
-    ':hover': {
-      backgroundColor: 'rgba(255, 23, 68, 0.2)',
-    }
   },
   logoutText: {
     display: 'inline',
-    '@media (max-width: 576px)': {
-      display: 'none',
-    }
   },
   main: {
     flex: 1,
@@ -307,7 +416,6 @@ const styles = {
   },
   portalsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
     gap: '2rem',
   },
   portalCard: {
@@ -316,6 +424,7 @@ const styles = {
     flexDirection: 'column',
     gap: '1.25rem',
     cursor: 'pointer',
+    width: '100%',
   },
   iconContainer: {
     width: '60px',
@@ -343,6 +452,80 @@ const styles = {
     fontWeight: 600,
     fontSize: '0.9rem',
     marginTop: '12px',
+  },
+  agentDashboard: {
+    padding: '2rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem',
+    borderTop: '4px solid var(--primary)',
+  },
+  agentDashboardHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  agentDashboardTitle: {
+    fontSize: '1.25rem',
+    fontWeight: 700,
+  },
+  agentDashboardDesc: {
+    fontSize: '0.9rem',
+    color: 'var(--text-secondary)',
+    lineHeight: 1.5,
+  },
+  agentMetricsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+    gap: '1rem',
+  },
+  metricBox: {
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    border: '1px solid var(--bg-card-border)',
+    borderRadius: '8px',
+    padding: '1.25rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+  },
+  metricLabel: {
+    fontSize: '0.75rem',
+    color: 'var(--text-muted)',
+    fontWeight: 600,
+    textTransform: 'uppercase',
+  },
+  metricVal: {
+    fontSize: '1.6rem',
+    fontWeight: 700,
+    color: 'var(--text-primary)',
+  },
+  tableTitle: {
+    fontSize: '1rem',
+    fontWeight: 600,
+    marginBottom: '0.75rem',
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+  },
+  th: {
+    textAlign: 'left',
+    padding: '8px 12px',
+    fontSize: '0.8rem',
+    color: 'var(--text-muted)',
+    borderBottom: '1px solid var(--bg-card-border)',
+    fontWeight: 600,
+  },
+  td: {
+    padding: '12px',
+    fontSize: '0.85rem',
+    borderBottom: '1px solid var(--bg-card-border)',
+  },
+  tdEmpty: {
+    textAlign: 'center',
+    padding: '24px',
+    color: 'var(--text-muted)',
+    fontSize: '0.9rem',
   },
   footer: {
     padding: '2rem',

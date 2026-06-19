@@ -492,13 +492,13 @@ export const apiService = {
   },
 
   // Verify access at terminal (Next.js scanner API)
-  validateAccessQr: async (qrCode, gateway = 'Porte Principale') => {
+  validateAccessQr: async (qrCode, gateway = 'Porte Principale', agentEmail = null) => {
     await apiService.pingServers();
     const timestamp = new Date().toISOString();
     const terminalId = localStorage.getItem('smartport_terminal_id') || 'TERM-PAC-8001';
 
     if (!apiService.isOnline()) {
-      return apiService._validateAccessOffline(qrCode, gateway, timestamp);
+      return apiService._validateAccessOffline(qrCode, gateway, timestamp, agentEmail);
     }
 
     try {
@@ -533,7 +533,9 @@ export const apiService = {
         reason: resData.reason || '',
         gateway,
         type: resData.dossier?.type || 'IMPORT',
-        offline: false
+        offline: false,
+        agentEmail: agentEmail || null,
+        terminalId: terminalId
       };
       logs.unshift(newLog);
       localStorage.setItem('smartport_logs', JSON.stringify(logs));
@@ -547,14 +549,15 @@ export const apiService = {
 
     } catch (err) {
       console.warn('NextJS API scan validation failed. Executing fallback local validation...', err);
-      return apiService._validateAccessOffline(qrCode, gateway, timestamp);
+      return apiService._validateAccessOffline(qrCode, gateway, timestamp, agentEmail);
     }
   },
 
   // Helper for offline local QR code verification and queueing
-  _validateAccessOffline: (qrCode, gateway, timestamp) => {
+  _validateAccessOffline: (qrCode, gateway, timestamp, agentEmail = null) => {
     const dossiers = JSON.parse(localStorage.getItem('smartport_dossiers') || '[]');
     const matchedDossier = dossiers.find(d => d.qrCode === qrCode);
+    const terminalId = localStorage.getItem('smartport_terminal_id') || 'TERM-PAC-8001';
 
     let validationResult;
     if (matchedDossier) {
@@ -608,7 +611,9 @@ export const apiService = {
       license: validationResult.dossier?.license || 'Inconnu',
       reason: validationResult.status === 'REFUSE' ? validationResult.message : '',
       gateway,
-      type: validationResult.dossier?.type || 'IMPORT'
+      type: validationResult.dossier?.type || 'IMPORT',
+      agentEmail: agentEmail || null,
+      terminalId: terminalId
     };
 
     offlineQueue.push(newQueueItem);

@@ -76,7 +76,7 @@ function App() {
           onLogout={handleLogout}
         />
       )}
-      {view === 'dashboard' && (
+      {view === 'dashboard' && role === 'supervisor' && (
         <Dashboard 
           setView={setView} 
           onLogout={handleLogout} 
@@ -86,6 +86,7 @@ function App() {
         <Scanner 
           setView={setView} 
           onLogout={handleLogout} 
+          user={user}
         />
       )}
     </div>
