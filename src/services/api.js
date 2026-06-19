@@ -1,8 +1,106 @@
 // SmartPort Gateway - API Service & Fallback Synchronizer
 
 // API BASE URL CONFIGURATION
-const LARAVEL_API_URL = window.ENV?.LARAVEL_API_URL || 'http://localhost:8000/api/v1';
-const NEXTJS_API_URL = window.ENV?.NEXTJS_API_URL || 'http://localhost:3000/api/scan/v1';
+const LARAVEL_API_URL = import.meta.env?.VITE_LARAVEL_API_URL || window.ENV?.LARAVEL_API_URL || 'http://localhost:8000/api/v1';
+const NEXTJS_API_URL = import.meta.env?.VITE_NEXTJS_API_URL || window.ENV?.NEXTJS_API_URL || 'http://localhost:3000/api/scan/v1';
+const SOAP_API_URL = import.meta.env?.VITE_SOAP_API_URL || window.ENV?.SOAP_API_URL || 'https://codesoap.onrender.com';
+
+// SOAP XML CLIENT UTILITY
+export const soapClient = {
+  getSoapUrl: () => {
+    if (import.meta.env?.DEV) {
+      return '/soap-api';
+    }
+    return SOAP_API_URL;
+  },
+
+  callAction: async (actionName, requestXmlPayload) => {
+    const url = soapClient.getSoapUrl();
+    const envelope = `<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:smart="http://smartport.lacotonou.bj/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      ${requestXmlPayload}
+   </soapenv:Body>
+</soapenv:Envelope>`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/xml; charset=utf-8',
+          'SOAPAction': actionName
+        },
+        body: envelope
+      });
+
+      const responseXmlText = await response.text();
+      return {
+        success: response.ok,
+        status: response.status,
+        xml: responseXmlText,
+        parsed: soapClient.parseResponse(actionName, responseXmlText)
+      };
+    } catch (error) {
+      console.error(`SOAP Call error for ${actionName}:`, error);
+      return {
+        success: false,
+        error: error.message,
+        xml: null,
+        parsed: null
+      };
+    }
+  },
+
+  parseResponse: (actionName, xmlText) => {
+    if (!xmlText) return null;
+    
+    if (xmlText.includes('<soapenv:Fault>') || xmlText.includes('<Fault>')) {
+      const faultReasonMatch = xmlText.match(/<faultstring>([^<]+)<\/faultstring>/);
+      return {
+        fault: true,
+        message: faultReasonMatch ? faultReasonMatch[1] : 'Unknown SOAP Fault'
+      };
+    }
+
+    const cleanXml = xmlText.replace(/tns:|smart:|soapenv:/g, '');
+
+    if (actionName === 'GetDossier') {
+      const idMatch = cleanXml.match(/<id>([^<]+)<\/id>/);
+      const statutMatch = cleanXml.match(/<statut>([^<]+)<\/statut>/);
+      const typeOpMatch = cleanXml.match(/<type_operation>([^<]+)<\/type_operation>/);
+      
+      if (idMatch || statutMatch || typeOpMatch) {
+        return {
+          id: idMatch ? idMatch[1] : '',
+          statut: statutMatch ? statutMatch[1] : '',
+          type_operation: typeOpMatch ? typeOpMatch[1] : ''
+        };
+      }
+    } else if (actionName === 'CreateDossier') {
+      const successMatch = cleanXml.match(/<success>([^<]+)<\/success>/);
+      const messageMatch = cleanXml.match(/<message>([^<]+)<\/message>/);
+      
+      return {
+        success: successMatch ? successMatch[1] === 'true' : false,
+        message: messageMatch ? messageMatch[1] : ''
+      };
+    }
+
+    return null;
+  },
+
+  getDossier: async (referenceMetier) => {
+    const payload = `<GetDossierRequest><reference_metier>${referenceMetier}</reference_metier></GetDossierRequest>`;
+    return await soapClient.callAction('GetDossier', payload);
+  },
+
+  createDossier: async (referenceMetier, statut, typeOperation) => {
+    const payload = `<CreateDossierRequest><reference_metier>${referenceMetier}</reference_metier><statut>${statut}</statut><type_operation>${typeOperation}</type_operation></CreateDossierRequest>`;
+    return await soapClient.callAction('CreateDossier', payload);
+  }
+};
+
 
 // Initial Mock Seed Data
 const SEED_DOSSIERS = [
@@ -49,6 +147,7 @@ initDb();
 
 export const apiService = {
   _delay: (ms = 400) => new Promise(resolve => setTimeout(resolve, ms)),
+  soapClient,
 
   // Check if API is currently operational
   isOnline: () => {
@@ -369,6 +468,18 @@ export const apiService = {
       const dossiers = JSON.parse(localStorage.getItem('smartport_dossiers') || '[]');
       const newDossier = { ...dossier, id: resData.id || String(Date.now()) };
       localStorage.setItem('smartport_dossiers', JSON.stringify([...dossiers, newDossier]));
+
+      // Synchronize with SOAP Service (Python legacy interconnector)
+      if (apiService.isOnline()) {
+        try {
+          const soapType = (dossier.type || dossier.type_operation || 'IMPORT').toUpperCase();
+          const soapStatus = (dossier.status || 'VALIDE').toUpperCase();
+          const soapRef = dossier.number || dossier.reference_metier;
+          await soapClient.createDossier(soapRef, soapStatus, soapType);
+        } catch (soapErr) {
+          console.warn('Sync to SOAP API failed during dossier save:', soapErr);
+        }
+      }
 
       return { success: true, data: newDossier };
     } catch (err) {
