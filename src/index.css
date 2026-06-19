@@ -132,14 +132,295 @@ body {
   color: #fff !important;
 }
 
-/* Responsive adjustments for Landing Page */
+/* Responsive adjustments for Landing, Login, Hub, Dashboard, and Scanner */
 @media (max-width: 768px) {
+  /* Hiding API status indicators as requested */
+  .landing-api-badge,
+  .login-api-badge,
+  .hub-api-badge,
+  .dashboard-api-badge,
+  .scanner-network-badge {
+    display: none !important;
+  }
+
+  /* Navigation Links on Landing */
   .nav-links-responsive {
     display: none !important;
+  }
+
+  /* Landing Page containers */
+  .landing-container {
+    padding-top: 60px !important;
+  }
+  .landing-navbar {
+    width: calc(100% - 20px) !important;
+    top: 10px !important;
+    padding: 0 12px !important;
+    height: 55px !important;
+  }
+  .landing-logo-text {
+    font-size: 1.05rem !important;
+  }
+  .landing-nav-action-btn {
+    padding: 6px 12px !important;
+    font-size: 0.75rem !important;
+    border-radius: 6px !important;
+  }
+
+  /* Hero Section */
+  .landing-hero-section {
+    padding: 3rem 1rem 2rem 1rem !important;
+    min-height: auto !important;
+    gap: 1.5rem !important;
+  }
+  .landing-hero-title {
+    font-size: 2.2rem !important;
+    line-height: 1.25 !important;
+  }
+  .landing-hero-desc {
+    font-size: 0.95rem !important;
+    margin-bottom: 1.5rem !important;
+    line-height: 1.5 !important;
+  }
+  .landing-hero-actions {
+    gap: 10px !important;
+    width: 100% !important;
+  }
+  .landing-hero-actions button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 12px 20px !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* Sync Banner */
+  .landing-sync-banner {
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 10px 14px !important;
+  }
+  .landing-sync-left {
+    flex-direction: column !important;
+    gap: 6px !important;
+    align-items: center !important;
+  }
+  .landing-sync-left span {
+    font-size: 0.8rem !important;
+    text-align: center !important;
+  }
+
+  /* Grid Containers */
+  .landing-about-grid,
+  .landing-features-grid,
+  .landing-roles-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+  .landing-section {
+    padding: 3rem 1rem !important;
+  }
+  .landing-section-header {
+    margin-bottom: 2rem !important;
+  }
+  .landing-section-title {
+    font-size: 1.6rem !important;
+  }
+  .landing-role-card {
+    padding: 2rem 1.5rem !important;
   }
   .footer-main-responsive {
     grid-template-columns: 1fr !important;
     gap: 2rem !important;
+  }
+
+  /* Login / Connexion */
+  .login-container {
+    padding: 1rem !important;
+  }
+  .login-header {
+    margin-bottom: 1rem !important;
+  }
+  .login-card {
+    padding: 1.5rem !important;
+    gap: 1.2rem !important;
+    width: 100% !important;
+  }
+  .login-card-title {
+    font-size: 1.3rem !important;
+  }
+  .login-card-subtitle {
+    font-size: 0.8rem !important;
+  }
+
+  /* Personnel Hub */
+  .hub-container {
+    padding: 0 !important;
+  }
+  .hub-header {
+    padding: 0.75rem 1rem !important;
+  }
+  .hub-main {
+    padding: 1rem !important;
+    gap: 1.5rem !important;
+  }
+  .hub-welcome-card {
+    padding: 1.25rem !important;
+    gap: 1.25rem !important;
+  }
+  .hub-avatar-container {
+    gap: 12px !important;
+  }
+  .hub-avatar {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .hub-avatar svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .hub-welcome-title {
+    font-size: 1.35rem !important;
+  }
+  .hub-user-email {
+    font-size: 0.8rem !important;
+  }
+  .hub-meta-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding-top: 1rem !important;
+  }
+  .hub-section-title {
+    font-size: 1.25rem !important;
+  }
+  .hub-portals-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+  .hub-portal-card {
+    padding: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  .hub-agent-dashboard {
+    padding: 1.25rem !important;
+    gap: 1rem !important;
+  }
+  .hub-agent-metrics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  .hub-logout-text {
+    display: none !important;
+  }
+  .hub-logout-btn {
+    padding: 8px !important;
+    border-radius: 50% !important;
+    width: 36px !important;
+    height: 36px !important;
+    justify-content: center !important;
+  }
+
+  /* Supervisor Dashboard */
+  .dashboard-container {
+    padding: 1rem !important;
+    gap: 1.25rem !important;
+  }
+  .dashboard-navbar {
+    gap: 1rem !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+  .dashboard-logo-group svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+  .dashboard-nav-title {
+    font-size: 1.1rem !important;
+  }
+  .dashboard-metrics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  .dashboard-metric-card {
+    padding: 1rem !important;
+    gap: 1rem !important;
+  }
+  .dashboard-metric-value {
+    font-size: 1.5rem !important;
+  }
+  .dashboard-tab-container {
+    gap: 0.25rem !important;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .dashboard-tab-btn {
+    padding: 8px 12px !important;
+    font-size: 0.8rem !important;
+  }
+  .dashboard-content-body {
+    padding: 1rem !important;
+  }
+  .dashboard-table-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    margin-bottom: 1rem !important;
+  }
+  .dashboard-table-header button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .dashboard-table-wrapper {
+    margin: 0 -1rem !important;
+    padding: 0 1rem !important;
+    width: calc(100% + 2rem) !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Scanner Component */
+  .scanner-container {
+    padding: 1rem !important;
+  }
+  .scanner-topbar {
+    margin-bottom: 1rem !important;
+  }
+  .scanner-header-title {
+    font-size: 1.05rem !important;
+  }
+  .scanner-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+  .scanner-scan-section {
+    padding: 1.25rem !important;
+    gap: 1.25rem !important;
+  }
+  .scanner-viewport {
+    height: 180px !important;
+  }
+  .scanner-target {
+    width: 100px !important;
+    height: 100px !important;
+  }
+  .scanner-input-group {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .scanner-scan-btn {
+    width: 100% !important;
+  }
+  .scanner-shortcut-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .scanner-outcome-card {
+    padding: 1.25rem !important;
+    gap: 1.25rem !important;
   }
 }
 

@@ -33,14 +33,14 @@ export default function DashboardPersonnel({ user, setView, onLogout }) {
   }, [user]);
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="hub-container">
       {/* Top Navbar */}
-      <header style={styles.header}>
-        <div style={styles.logoArea}>
+      <header style={styles.header} className="hub-header">
+        <div style={styles.logoArea} className="hub-logo-area">
           <Shield size={24} color="var(--primary)" />
-          <span style={styles.logoText}>SmartPort Hub</span>
+          <span style={styles.logoText} className="hub-logo-text">SmartPort Hub</span>
         </div>
-        <div style={styles.headerRight}>
+        <div style={styles.headerRight} className="hub-header-right">
           <div 
             style={{
               ...styles.apiBadge,
@@ -48,53 +48,54 @@ export default function DashboardPersonnel({ user, setView, onLogout }) {
               backgroundColor: online ? 'var(--success-glow)' : 'var(--error-glow)',
               cursor: 'default'
             }}
+            className="hub-api-badge"
           >
             {online ? <Wifi size={14} color="var(--success)" /> : <WifiOff size={14} color="var(--error)" />}
-            <span style={{ color: online ? 'var(--success)' : 'var(--error)', fontWeight: 600 }}>
+            <span style={{ color: online ? 'var(--success)' : 'var(--error)', fontWeight: 600 }} className="hub-api-text">
               {online ? 'En Ligne' : 'Mode Dégradé'}
             </span>
           </div>
-          <button onClick={onLogout} style={styles.logoutBtn} title="Se déconnecter">
+          <button onClick={onLogout} style={styles.logoutBtn} className="hub-logout-btn" title="Se déconnecter">
             <LogOut size={18} />
-            <span style={styles.logoutText}>Déconnexion</span>
+            <span style={styles.logoutText} className="hub-logout-text">Déconnexion</span>
           </button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main style={styles.main}>
+      <main style={styles.main} className="hub-main">
         {/* Welcome Section */}
-        <section className="glass" style={styles.welcomeCard}>
-          <div style={styles.avatarContainer}>
-            <div style={styles.avatar}>
+        <section className="glass hub-welcome-card" style={styles.welcomeCard}>
+          <div style={styles.avatarContainer} className="hub-avatar-container">
+            <div style={styles.avatar} className="hub-avatar">
               <User size={36} color="#000" />
             </div>
             <div>
-              <span style={styles.userRoleTag}>
+              <span style={styles.userRoleTag} className="hub-user-role-tag">
                 {user?.role === 'supervisor' ? 'Superviseur / DSI' : 'Agent de Sécurité Terrain'}
               </span>
-              <h1 style={styles.welcomeTitle}>Bienvenue, {user?.name || 'Utilisateur'}</h1>
-              <p style={styles.userEmail}>{user?.email}</p>
+              <h1 style={styles.welcomeTitle} className="hub-welcome-title">Bienvenue, {user?.name || 'Utilisateur'}</h1>
+              <p style={styles.userEmail} className="hub-user-email">{user?.email}</p>
             </div>
           </div>
 
-          <div style={styles.metaGrid}>
-            <div style={styles.metaItem}>
-              <span style={styles.metaLabel}>ID Utilisateur</span>
-              <span style={styles.metaValue}>{user?.id || 'usr_conv_mock'}</span>
+          <div style={styles.metaGrid} className="hub-meta-grid">
+            <div style={styles.metaItem} className="hub-meta-item">
+              <span style={styles.metaLabel} className="hub-meta-label">ID Utilisateur</span>
+              <span style={styles.metaValue} className="hub-meta-value">{user?.id || 'usr_conv_mock'}</span>
             </div>
             {user?.role === 'agent' && (
-              <div style={styles.metaItem}>
-                <span style={styles.metaLabel}>Terminal Matériel</span>
-                <span style={{ ...styles.metaValue, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={styles.metaItem} className="hub-meta-item">
+                <span style={styles.metaLabel} className="hub-meta-label">Terminal Matériel</span>
+                <span style={{ ...styles.metaValue, display: 'flex', alignItems: 'center', gap: '4px' }} className="hub-meta-value">
                   <Smartphone size={14} color="var(--primary)" />
                   {user?.hardwareId || 'TERM-PAC-8001'}
                 </span>
               </div>
             )}
-            <div style={styles.metaItem}>
-              <span style={styles.metaLabel}>Statut Session</span>
-              <span style={{ ...styles.metaValue, color: online ? 'var(--success)' : 'var(--warning)' }}>
+            <div style={styles.metaItem} className="hub-meta-item">
+              <span style={styles.metaLabel} className="hub-meta-label">Statut Session</span>
+              <span style={{ ...styles.metaValue, color: online ? 'var(--success)' : 'var(--warning)' }} className="hub-meta-value">
                 {online ? 'Session Synchrone' : 'Session Locale Hors-Ligne'}
               </span>
             </div>
@@ -102,19 +103,22 @@ export default function DashboardPersonnel({ user, setView, onLogout }) {
         </section>
 
         {/* Action Title */}
-        <div style={styles.sectionTitleArea}>
-          <h2 style={styles.sectionTitle}>Que souhaitez-vous faire aujourd'hui ?</h2>
-          <p style={styles.sectionSubtitle}>Sélectionnez un portail d'atterrissage pour commencer</p>
+        <div style={styles.sectionTitleArea} className="hub-section-title-area">
+          <h2 style={styles.sectionTitle} className="hub-section-title">Que souhaitez-vous faire aujourd'hui ?</h2>
+          <p style={styles.sectionSubtitle} className="hub-section-subtitle">Sélectionnez un portail d'atterrissage pour commencer</p>
         </div>
 
         {/* Portals Grid */}
-        <div style={{
-          ...styles.portalsGrid,
-          gridTemplateColumns: user?.role === 'supervisor' ? 'repeat(auto-fit, minmax(300px, 1fr))' : '1fr'
-        }}>
+        <div 
+          style={{
+            ...styles.portalsGrid,
+            gridTemplateColumns: user?.role === 'supervisor' ? 'repeat(auto-fit, minmax(300px, 1fr))' : '1fr'
+          }}
+          className="hub-portals-grid"
+        >
           {/* Scanner Portal Card */}
           <div 
-            className="glass glass-interactive" 
+            className="glass glass-interactive hub-portal-card" 
             style={{
               ...styles.portalCard,
               borderTop: '4px solid var(--primary)',
@@ -139,7 +143,7 @@ export default function DashboardPersonnel({ user, setView, onLogout }) {
           {/* Supervisor Portal Card (Only visible to supervisor) */}
           {user?.role === 'supervisor' && (
             <div 
-              className="glass glass-interactive" 
+              className="glass glass-interactive hub-portal-card" 
               style={{
                 ...styles.portalCard,
                 borderTop: '4px solid var(--secondary)'
@@ -163,7 +167,7 @@ export default function DashboardPersonnel({ user, setView, onLogout }) {
 
         {/* Agent Personal Statistics Dashboard */}
         {user?.role === 'agent' && (
-          <section className="glass" style={styles.agentDashboard}>
+          <section className="glass hub-agent-dashboard" style={styles.agentDashboard}>
             <div style={styles.agentDashboardHeader}>
               <Activity size={20} color="var(--primary)" />
               <h3 style={styles.agentDashboardTitle}>Mon Tableau de Bord (Statistiques de Contrôle)</h3>
@@ -173,22 +177,22 @@ export default function DashboardPersonnel({ user, setView, onLogout }) {
             </p>
 
             {/* Metrics Row */}
-            <div style={styles.agentMetricsGrid}>
-              <div style={styles.metricBox}>
+            <div style={styles.agentMetricsGrid} className="hub-agent-metrics-grid">
+              <div style={styles.metricBox} className="hub-metric-box">
                 <span style={styles.metricLabel}>Total Scans</span>
                 <span style={styles.metricVal}>{stats.total}</span>
               </div>
-              <div style={styles.metricBox}>
+              <div style={styles.metricBox} className="hub-metric-box">
                 <span style={styles.metricLabel}>Scans Hors-Ligne</span>
                 <span style={{ ...styles.metricVal, color: stats.offline > 0 ? 'var(--warning)' : 'var(--text-primary)' }}>
                   {stats.offline}
                 </span>
               </div>
-              <div style={styles.metricBox}>
+              <div style={styles.metricBox} className="hub-metric-box">
                 <span style={styles.metricLabel}>Validations Autorisées</span>
                 <span style={{ ...styles.metricVal, color: 'var(--success)' }}>{stats.authorized}</span>
               </div>
-              <div style={styles.metricBox}>
+              <div style={styles.metricBox} className="hub-metric-box">
                 <span style={styles.metricLabel}>Passages Refusés</span>
                 <span style={{ ...styles.metricVal, color: 'var(--error)' }}>{stats.refused}</span>
               </div>

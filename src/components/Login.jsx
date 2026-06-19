@@ -117,20 +117,20 @@ export default function Login({ setView, initialRole, onLoginSuccess }) {
   };
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <button onClick={() => setView('landing')} style={styles.backBtn}>
+    <div style={styles.container} className="login-container">
+      <header style={styles.header} className="login-header">
+        <button onClick={() => setView('landing')} style={styles.backBtn} className="login-back-btn">
           <ArrowLeft size={20} />
         </button>
-        <div style={{ ...styles.apiBadge, borderColor: online ? 'var(--success)' : 'var(--error)' }}>
+        <div style={{ ...styles.apiBadge, borderColor: online ? 'var(--success)' : 'var(--error)' }} className="login-api-badge">
           {online ? <Wifi size={14} color="var(--success)" /> : <WifiOff size={14} color="var(--error)" />}
-          <span style={{ color: online ? 'var(--success)' : 'var(--error)' }}>
+          <span style={{ color: online ? 'var(--success)' : 'var(--error)' }} className="login-api-text">
             API: {online ? 'En ligne' : 'Mode Dégradé'}
           </span>
         </div>
       </header>
 
-      <main className="glass" style={styles.loginCard}>
+      <main className="glass login-card" style={styles.loginCard}>
         <div style={styles.cardHeader}>
           <Shield size={42} color={loginType === 'supervisor' ? 'var(--secondary)' : 'var(--primary)'} />
           <h2 style={styles.title}>Portail d'Accès Sécurisé</h2>

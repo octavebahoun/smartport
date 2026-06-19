@@ -58,12 +58,12 @@ export default function Landing({ setView, setLoginRole }) {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="landing-container">
       {/* 1. Header & Navigation Bar */}
-      <header style={styles.navbar} className="glass">
-        <div style={styles.navLeft}>
+      <header style={styles.navbar} className="glass landing-navbar">
+        <div style={styles.navLeft} className="landing-nav-left">
           <Shield size={28} color="var(--primary)" />
-          <span style={styles.navLogoText}>SmartPort <span style={{ color: 'var(--primary)' }}>Gateway</span></span>
+          <span style={styles.navLogoText} className="landing-logo-text">SmartPort <span style={{ color: 'var(--primary)' }} className="landing-logo-span">Gateway</span></span>
         </div>
         <nav style={styles.navLinks} className="nav-links-responsive">
           <button onClick={() => scrollToSection('hero')} style={styles.navLinkBtn} className="nav-link-btn">Accueil</button>
@@ -71,31 +71,31 @@ export default function Landing({ setView, setLoginRole }) {
           <button onClick={() => scrollToSection('features')} style={styles.navLinkBtn} className="nav-link-btn">Fonctionnalités</button>
           <button onClick={() => scrollToSection('roles')} style={styles.navLinkBtn} className="nav-link-btn">Espaces d'accès</button>
         </nav>
-        <div style={styles.navRight}>
-          <div style={{ ...styles.apiBadge, borderColor: online ? 'var(--success)' : 'var(--error)' }}>
-            <span style={{ ...styles.statusDot, backgroundColor: online ? 'var(--success)' : 'var(--error)' }} />
-            <span style={{ color: online ? 'var(--success)' : 'var(--error)', fontSize: '0.8rem', fontWeight: 600 }}>
+        <div style={styles.navRight} className="landing-nav-right">
+          <div style={{ ...styles.apiBadge, borderColor: online ? 'var(--success)' : 'var(--error)' }} className="landing-api-badge">
+            <span style={{ ...styles.statusDot, backgroundColor: online ? 'var(--success)' : 'var(--error)' }} className="landing-status-dot" />
+            <span style={{ color: online ? 'var(--success)' : 'var(--error)', fontSize: '0.8rem', fontWeight: 600 }} className="landing-api-text">
               {online ? 'En ligne' : 'Mode Hors-ligne'}
             </span>
           </div>
-          <button onClick={() => scrollToSection('roles')} style={styles.navActionBtn} className="nav-action-btn">
+          <button onClick={() => scrollToSection('roles')} style={styles.navActionBtn} className="nav-action-btn landing-nav-action-btn">
             Connexion <ArrowRight size={14} style={{ marginLeft: 6 }} />
           </button>
         </div>
       </header>
 
       {/* 2. Hero Section */}
-      <section id="hero" style={styles.heroSection}>
-        <div style={styles.heroContent}>
+      <section id="hero" style={styles.heroSection} className="landing-hero-section">
+        <div style={styles.heroContent} className="landing-hero-content">
           <span style={styles.heroTagline}>Port Autonome de Cotonou</span>
-          <h1 style={styles.heroTitle}>
+          <h1 style={styles.heroTitle} className="landing-hero-title">
             Modernisez le contrôle et la <br />
             <span style={{ color: 'var(--primary)' }}>sécurité de vos flux de fret</span>
           </h1>
-          <p style={styles.heroDescription}>
+          <p style={styles.heroDescription} className="landing-hero-desc">
             SmartPort Gateway est la plateforme de référence pour la validation en temps réel des laissez-passer, la traçabilité du transit logistique et la supervision des agents de contrôle terrain.
           </p>
-          <div style={styles.heroActions}>
+          <div style={styles.heroActions} className="landing-hero-actions">
             <button onClick={() => scrollToSection('roles')} style={styles.heroPrimaryBtn}>
               Accéder aux portails <ArrowRight size={16} style={{ marginLeft: 8 }} />
             </button>
@@ -107,8 +107,8 @@ export default function Landing({ setView, setLoginRole }) {
         
         {/* Connection sync status if queue exists */}
         {queueSize > 0 && (
-          <div className="glass" style={styles.syncCardBanner}>
-            <div style={styles.syncCardBannerLeft}>
+          <div className="glass landing-sync-banner" style={styles.syncCardBanner}>
+            <div style={styles.syncCardBannerLeft} className="landing-sync-left">
               <Activity size={20} color="var(--warning)" style={{ animation: 'pulse 2s infinite' }} />
               <div style={{ marginLeft: 12, textAlign: 'left' }}>
                 <span style={{ color: 'var(--warning)', fontWeight: 600, fontSize: '0.9rem', display: 'block' }}>
@@ -145,7 +145,7 @@ export default function Landing({ setView, setLoginRole }) {
           </p>
         </div>
 
-        <div style={styles.aboutGrid}>
+        <div style={styles.aboutGrid} className="landing-about-grid">
           <div className="glass" style={styles.aboutCard}>
             <h3 style={styles.aboutCardTitle}>Zéro interruption de service</h3>
             <p style={styles.aboutCardText}>
@@ -177,7 +177,7 @@ export default function Landing({ setView, setLoginRole }) {
           </p>
         </div>
 
-        <div style={styles.featuresGrid}>
+        <div style={styles.featuresGrid} className="landing-features-grid">
           {/* Feature 1 */}
           <div className="glass" style={styles.featureCard}>
             <div style={{ ...styles.featureIconContainer, backgroundColor: 'rgba(0, 229, 255, 0.1)' }}>
@@ -235,7 +235,7 @@ export default function Landing({ setView, setLoginRole }) {
           </p>
         </div>
 
-        <div style={styles.rolesGrid}>
+        <div style={styles.rolesGrid} className="landing-roles-grid">
           {/* Supervisor Card */}
           <div 
             onClick={() => { setLoginRole('supervisor'); setView('login'); }} 

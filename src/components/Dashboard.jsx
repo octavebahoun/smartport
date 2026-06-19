@@ -106,21 +106,21 @@ export default function Dashboard({ setView, onLogout }) {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="dashboard-container">
       {/* Top Navbar */}
-      <header style={styles.navbar}>
-        <div style={styles.navLeft}>
-          <button onClick={() => setView('dashboard-personnel')} style={styles.backBtn} title="Retour au Hub">
+      <header style={styles.navbar} className="dashboard-navbar">
+        <div style={styles.navLeft} className="dashboard-nav-left">
+          <button onClick={() => setView('dashboard-personnel')} style={styles.backBtn} className="dashboard-back-btn" title="Retour au Hub">
             <ArrowLeft size={20} color="var(--primary)" />
           </button>
-          <div style={styles.logoGroup}>
+          <div style={styles.logoGroup} className="dashboard-logo-group">
             <ShieldCheck size={28} color="var(--secondary)" />
-            <h1 style={styles.navTitle}>Supervision Gateway</h1>
+            <h1 style={styles.navTitle} className="dashboard-nav-title">Supervision Gateway</h1>
           </div>
         </div>
 
-        <div style={styles.navRight}>
-          <div style={{ ...styles.apiBadge, borderColor: online ? 'var(--success)' : 'var(--error)' }}>
+        <div style={styles.navRight} className="dashboard-nav-right">
+          <div style={{ ...styles.apiBadge, borderColor: online ? 'var(--success)' : 'var(--error)' }} className="dashboard-api-badge">
             {online ? <Wifi size={16} color="var(--success)" /> : <WifiOff size={16} color="var(--error)" />}
             <span style={{ color: online ? 'var(--success)' : 'var(--error)' }}>
               API: {online ? 'Opérationnelle' : 'Déconnectée'}
@@ -132,41 +132,41 @@ export default function Dashboard({ setView, onLogout }) {
 
       {/* Connection fallbacks banner */}
       {fallbackMode && (
-        <div style={styles.fallbackNotice}>
+        <div style={styles.fallbackNotice} className="dashboard-fallback-notice">
           ⚠️ Données chargées depuis le cache local (Mode dégradé). Les créations ou modifications sont désactivées.
         </div>
       )}
 
       {/* Dashboard Metrics */}
-      <section style={styles.metricsGrid}>
-        <div className="glass" style={styles.metricCard}>
-          <div style={styles.metricIcon}>
+      <section style={styles.metricsGrid} className="dashboard-metrics-grid">
+        <div className="glass dashboard-metric-card" style={styles.metricCard}>
+          <div style={styles.metricIcon} className="dashboard-metric-icon">
             <FileText size={22} color="var(--primary)" />
           </div>
           <div>
-            <p style={styles.metricLabel}>Dossiers Actifs</p>
-            <h3 style={styles.metricVal}>{dossiers.length}</h3>
+            <p style={styles.metricLabel} className="dashboard-metric-label">Dossiers Actifs</p>
+            <h3 style={styles.metricVal} className="dashboard-metric-val">{dossiers.length}</h3>
           </div>
         </div>
 
-        <div className="glass" style={styles.metricCard}>
-          <div style={styles.metricIcon}>
+        <div className="glass dashboard-metric-card" style={styles.metricCard}>
+          <div style={styles.metricIcon} className="dashboard-metric-icon">
             <Users size={22} color="var(--secondary)" />
           </div>
           <div>
-            <p style={styles.metricLabel}>Opérations terrain</p>
-            <h3 style={styles.metricVal}>{logs.length}</h3>
+            <p style={styles.metricLabel} className="dashboard-metric-label">Opérations terrain</p>
+            <h3 style={styles.metricVal} className="dashboard-metric-val">{logs.length}</h3>
           </div>
         </div>
 
-        <div className="glass" style={styles.metricCard}>
-          <div style={styles.metricIcon}>
+        <div className="glass dashboard-metric-card" style={styles.metricCard}>
+          <div style={styles.metricIcon} className="dashboard-metric-icon">
             <Database size={22} color="var(--warning)" />
           </div>
           <div>
-            <p style={styles.metricLabel}>File Hors-ligne</p>
-            <div style={styles.queueInfo}>
-              <h3 style={styles.metricVal}>{queueSize}</h3>
+            <p style={styles.metricLabel} className="dashboard-metric-label">File Hors-ligne</p>
+            <div style={styles.queueInfo} className="dashboard-queue-info">
+              <h3 style={styles.metricVal} className="dashboard-metric-val">{queueSize}</h3>
               {queueSize > 0 && (
                 <button 
                   onClick={handleSyncQueue} 
@@ -175,6 +175,7 @@ export default function Dashboard({ setView, onLogout }) {
                     ...styles.syncButton,
                     opacity: online ? 1 : 0.5
                   }}
+                  className="dashboard-sync-button"
                 >
                   <RefreshCw size={12} style={{ animation: isSyncing ? 'spin-slow 2s linear infinite' : 'none', marginRight: 4 }} />
                   {isSyncing ? 'Sync...' : 'Sync'}
@@ -186,16 +187,18 @@ export default function Dashboard({ setView, onLogout }) {
       </section>
 
       {/* Main content tabs */}
-      <div style={styles.tabContainer}>
+      <div style={styles.tabContainer} className="dashboard-tab-container">
         <button 
           onClick={() => setActiveTab('dossiers')} 
           style={{ ...styles.tabBtn, borderBottom: activeTab === 'dossiers' ? '2px solid var(--primary)' : 'none', color: activeTab === 'dossiers' ? 'var(--primary)' : 'var(--text-secondary)' }}
+          className="dashboard-tab-btn"
         >
           Dossiers Logistiques
         </button>
         <button 
           onClick={() => setActiveTab('logs')} 
           style={{ ...styles.tabBtn, borderBottom: activeTab === 'logs' ? '2px solid var(--primary)' : 'none', color: activeTab === 'logs' ? 'var(--primary)' : 'var(--text-secondary)' }}
+          className="dashboard-tab-btn"
         >
           Journaux d'Audit & Accès
         </button>
@@ -203,7 +206,7 @@ export default function Dashboard({ setView, onLogout }) {
       </div>
 
       {/* Tab Contents */}
-      <main className="glass" style={styles.contentBody}>
+      <main className="glass dashboard-content-body" style={styles.contentBody}>
         {activeTab === 'dossiers' && (
           <div>
             <div style={styles.tableHeader}>
@@ -221,7 +224,7 @@ export default function Dashboard({ setView, onLogout }) {
               </button>
             </div>
             
-            <div style={styles.tableWrapper}>
+            <div style={styles.tableWrapper} className="dashboard-table-wrapper">
               <table style={styles.table}>
                 <thead>
                   <tr>
@@ -277,7 +280,7 @@ export default function Dashboard({ setView, onLogout }) {
               <h3 style={styles.tableTitle}>Historique des contrôles de sécurité</h3>
             </div>
             
-            <div style={styles.tableWrapper}>
+            <div style={styles.tableWrapper} className="dashboard-table-wrapper">
               <table style={styles.table}>
                 <thead>
                   <tr>

@@ -67,38 +67,39 @@ export default function Scanner({ setView, onLogout }) {
   ];
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="scanner-container">
       {/* Mobile Top Bar */}
-      <header style={styles.topBar}>
-        <button onClick={() => setView('dashboard-personnel')} style={styles.backBtn} title="Retour au Hub">
+      <header style={styles.topBar} className="scanner-topbar">
+        <button onClick={() => setView('dashboard-personnel')} style={styles.backBtn} className="scanner-back-btn" title="Retour au Hub">
           <ArrowLeft size={20} color="var(--primary)" />
         </button>
-        <span style={styles.headerTitle}>Poste de Contrôle</span>
-        <div style={{ ...styles.networkBadge, color: online ? 'var(--success)' : 'var(--warning)' }}>
+        <span style={styles.headerTitle} className="scanner-header-title">Poste de Contrôle</span>
+        <div style={{ ...styles.networkBadge, color: online ? 'var(--success)' : 'var(--warning)' }} className="scanner-network-badge">
           {online ? <Wifi size={18} /> : <WifiOff size={18} />}
-          <span style={styles.networkText}>{online ? 'Connecté' : 'Hors-ligne (Dégradé)'}</span>
+          <span style={styles.networkText} className="scanner-network-text">{online ? 'Connecté' : 'Hors-ligne (Dégradé)'}</span>
         </div>
       </header>
 
       {/* Main viewport */}
-      <main style={styles.main}>
+      <main style={styles.main} className="scanner-main">
         {/* Offline Alert */}
         {!online && (
-          <div style={styles.offlineBanner}>
+          <div style={styles.offlineBanner} className="scanner-offline-banner">
             <AlertTriangle size={20} style={{ marginRight: 8 }} />
             <span>Serveur inaccessible. Fallback local actif : validation via cache et files d'attente localisées.</span>
           </div>
         )}
 
-        <div style={styles.layout}>
+        <div style={styles.layout} className="scanner-layout">
           {/* Left panel: Scan simulator */}
-          <div className="glass" style={styles.scanSection}>
-            <div style={styles.gatewaySelector}>
+          <div className="glass scanner-scan-section" style={styles.scanSection}>
+            <div style={styles.gatewaySelector} className="scanner-gateway-selector">
               <label style={styles.label}>Poste d'Accès :</label>
               <select 
                 value={selectedGateway} 
                 onChange={(e) => setSelectedGateway(e.target.value)}
                 style={styles.select}
+                className="scanner-select"
               >
                 <option value="Porte Principale A">Porte Principale A</option>
                 <option value="Porte Est B">Porte Est B</option>
@@ -107,9 +108,9 @@ export default function Scanner({ setView, onLogout }) {
             </div>
 
             {/* Scan animation screen */}
-            <div style={styles.scannerViewport}>
-              <div style={styles.scannerTarget}>
-                <div style={styles.scannerLaser} />
+            <div style={styles.scannerViewport} className="scanner-viewport">
+              <div style={styles.scannerTarget} className="scanner-target">
+                <div style={styles.scannerLaser} className="scanner-laser" />
                 <Scan size={60} color="rgba(255, 255, 255, 0.2)" />
               </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 15 }}>
@@ -118,25 +119,26 @@ export default function Scanner({ setView, onLogout }) {
             </div>
 
             {/* Manual QR Input simulation */}
-            <div style={styles.inputGroup}>
+            <div style={styles.inputGroup} className="scanner-input-group">
               <input 
                 type="text" 
                 placeholder="Simuler ou saisir un QR Code..." 
                 value={qrInput}
                 onChange={(e) => setQrInput(e.target.value)}
                 style={styles.input}
+                className="scanner-input"
               />
-              <button onClick={() => handleScan()} disabled={loading} style={styles.scanBtn}>
+              <button onClick={() => handleScan()} disabled={loading} style={styles.scanBtn} className="scanner-scan-btn">
                 {loading ? 'Validation...' : 'Valider'}
               </button>
             </div>
 
             {/* Test shortcuts */}
-            <div style={styles.shortcuts}>
+            <div style={styles.shortcuts} className="scanner-shortcuts">
               <p style={styles.shortcutLabel}>Simulations rapides :</p>
-              <div style={styles.shortcutGrid}>
+              <div style={styles.shortcutGrid} className="scanner-shortcut-grid">
                 {testCodes.map((tc, idx) => (
-                  <button key={idx} onClick={() => { setQrInput(tc.code); handleScan(tc.code); }} style={styles.shortcutBtn} className="shortcut-btn">
+                  <button key={idx} onClick={() => { setQrInput(tc.code); handleScan(tc.code); }} style={styles.shortcutBtn} className="shortcut-btn scanner-shortcut-btn">
                     {tc.name}
                   </button>
                 ))}
@@ -145,11 +147,11 @@ export default function Scanner({ setView, onLogout }) {
           </div>
 
           {/* Right panel: Active Result or Recent Logs */}
-          <div style={styles.resultSection}>
+          <div style={styles.resultSection} className="scanner-result-section">
             {scanResult ? (
               /* Validation Outcome Screen */
               <div 
-                className="glass" 
+                className="glass scanner-outcome-card" 
                 style={{ 
                   ...styles.outcomeCard,
                   borderColor: scanResult.status === 'AUTORISE' ? 'var(--success)' : 
